@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eMedik - Kelulusan Dwi Peringkat (Pengguna-Pelulus)</title>
+    <!-- Rujukan CDN Online -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-emerald-100 via-teal-200 to-green-200 min-h-screen font-sans selection:bg-emerald-300">
+
+    <!-- TopBar Navigation (Liquid Glass Tema Emerald) -->
+    <nav class="bg-white/40 backdrop-blur-md border-b border-white/50 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center">
+                    <span class="font-bold text-2xl text-gray-800 tracking-wide">eMedik <span class="text-emerald-700 text-sm font-medium ml-1 px-2 py-1 bg-white/50 rounded-lg">Pelulus</span></span>
+                </div>
+                
+                <!-- Menu Navigasi Pengguna-Pelulus -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-2">
+                        <a href="index.html" class="text-gray-700 hover:bg-white/40 hover:text-emerald-900 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Utama</a>
+                        <a href="kl-dwi.html" class="bg-white/60 border border-white/50 text-emerald-800 px-3 py-2 rounded-xl text-sm font-semibold shadow-sm">Kelulusan Dwi Peringkat</a>
+                    </div>
+                </div>
+
+                <div>
+                    <a href="../index.html" class="bg-red-500/20 hover:bg-red-500/40 border border-red-200/50 text-red-700 px-5 py-2 rounded-xl text-sm font-bold transition duration-300 shadow-sm">Log Keluar</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alpine.js untuk kawalan modul Kelulusan Dwi Peringkat -->
+    <main x-data="{
+        paparan: 'senarai',
+        modalFIS: false,
+        noRujukanFIS: '',
+        statusDP4: '',
+        namaPemohonDP4: 'Nur Aina binti Hassan',
+        mesejStatusDP4() {
+            if (this.statusDP4 === 'HANTAR_DP3') return 'Tuntutan telah dihantar semula kepada Peringkat 3.';
+            if (this.statusDP4 === 'HANTAR_DP2') return 'Tuntutan telah dihantar semula kepada Peringkat 2.';
+            if (this.statusDP4 === 'HANTAR_PEMOHON') return `Tuntutan telah dihantar semula kepada ${this.namaPemohonDP4}.`;
+            return '';
+        },
+        simpanDP4() {
+            if (!this.statusDP4) return;
+            if (this.statusDP4 === 'LULUS_AKHIR') {
+                this.noRujukanFIS = String(Math.floor(100000000 + Math.random() * 900000000));
+            }
+            this.modalFIS = true;
+        },
+        ptjDipilih: '',
+        kodSubAkaun: '',
+        subAkaunMengikutPtj: {
+            B01: [
+                { kod: '51000-00100' },
+                { kod: '52000-00200' },
+                { kod: '53000-00300' }
+            ],
+            B02: [
+                { kod: '61000-00100' },
+                { kod: '62000-00200' },
+                { kod: '63000-00300' }
+            ]
+        }
+    }" class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        
+        <!-- ========================================================================= -->
+        <!-- PAPARAN 1: SENARAI MENUNGGU KELULUSAN DWI PERINGKAT                       -->
+        <!-- ========================================================================= -->
+        <div x-show="paparan === 'senarai'" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Senarai Kelulusan Dwi Peringkat</h2>
+                    <p class="text-sm text-gray-600 mt-1">Senarai tuntutan yang memerlukan tindakan Kelulusan Peringkat 3 dan Peringkat 4.</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto bg-white/50 rounded-xl shadow-sm border border-white/40">
+                <table class="w-full text-left text-sm text-gray-700">
+                    <thead class="bg-emerald-100/50 text-gray-800 font-semibold border-b border-white">
+                        <tr>
+                            <th class="p-4">ID Tuntutan <br><span class="text-[10px] font-mono text-emerald-700 bg-emerald-100 px-1 rounded">tb-id</span></th>
+                            <th class="p-4">Kategori <br><span class="text-[10px] font-mono text-emerald-700 bg-emerald-100 px-1 rounded">tb-kategori</span></th>
+                            <th class="p-4">Peringkat Semasa <br><span class="text-[10px] font-mono text-emerald-700 bg-emerald-100 px-1 rounded">paras-kelulusan</span></th>
+                            <th class="p-4">Amaun (RM) <br><span class="text-[10px] font-mono text-emerald-700 bg-emerald-100 px-1 rounded">tuntutan-amt</span></th>
+                            <th class="p-4 text-center">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/40">
+                        <!-- Contoh 1: Menunggu DP3 -->
+                        <tr class="hover:bg-white/40 transition">
+                            <td class="p-4 font-medium">TB2026-0501</td>
+                            <td class="p-4">Tuntutan Bayaran (TB)</td>
+                            <td class="p-4"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">DP Peringkat 3</span></td>
+                            <td class="p-4 font-medium text-emerald-700">1,250.00</td>
+                            <td class="p-4 text-center">
+                                <button @click="paparan = 'semakDP3'" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded-lg text-xs font-semibold transition shadow-sm">
+    Proses DP 3
+</button>
+                            </td>
+                        </tr>
+                        <!-- Contoh 2: Menunggu DP4 -->
+                        <tr class="hover:bg-white/40 transition">
+                            <td class="p-4 font-medium">TP2026-0302</td>
+                            <td class="p-4">Tuntutan Perjalanan (TP)</td>
+                            <td class="p-4"><span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-semibold">DP Peringkat 4</span></td>
+                            <td class="p-4 font-medium text-emerald-700">9,750.00</td>
+                            <td class="p-4 text-center">
+                                <button @click="paparan = 'semakDP4'" class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-semibold transition shadow-sm">
+    Proses DP 4
+</button>
+                            </td>
+                        </tr>
+                        <!-- Contoh 3: Menunggu DP3 -->
+                        <tr class="hover:bg-white/40 transition">
+                            <td class="p-4 font-medium">KK2026-0111</td>
+                            <td class="p-4">Tuntutan Kesihatan (KK)</td>
+                            <td class="p-4"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">DP Peringkat 3</span></td>
+                            <td class="p-4 font-medium text-emerald-700">2,100.50</td>
+                            <td class="p-4 text-center">
+                                <button @click="paparan = 'semakDP3'" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded-lg text-xs font-semibold transition shadow-sm">Proses DP 3</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- PAPARAN 2: BORANG KELULUSAN DP PERINGKAT 3 (SF-MDK-KL-DP-01)              -->
+        <!-- ========================================================================= -->
+        <div x-show="paparan === 'semakDP3'" style="display: none;" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-300/50 pb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Proses Kelulusan Dwi Peringkat 3</h2>
+                <button @click="paparan = 'senarai'" class="text-gray-600 hover:text-gray-800 font-medium text-sm transition">&larr; Batal & Kembali</button>
+            </div>
+
+            <form class="space-y-6">
+                <!-- Maklumat Tuntutan (Baca Sahaja) -->
+                <div class="p-5 bg-white/50 border border-white/80 rounded-2xl shadow-sm">
+                    <h3 class="text-sm font-bold text-gray-800 mb-4 border-b border-white pb-2">Maklumat Asas Tuntutan</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">ID Tuntutan <span class="ml-1 text-[9px] font-mono text-emerald-700 bg-emerald-100 px-1 rounded normal-case">tb-id</span></label>
+                            <p class="text-gray-800 font-medium">TB2026-0501</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Pemohon <span class="ml-1 text-[9px] font-mono text-emerald-700 bg-emerald-100 px-1 rounded normal-case">pemohon-nama</span></label>
+                            <p class="text-gray-800 font-medium">Ahmad Bin Abu</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Jumlah Amaun Dipohon <span class="ml-1 text-[9px] font-mono text-emerald-700 bg-emerald-100 px-1 rounded normal-case">tuntutan-amt</span></label>
+                            <p class="text-blue-700 font-bold text-lg">RM 1,250.00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- JADUAL DI DALAM BORANG (3 Contoh Item Tuntutan) -->
+                <div class="p-5 bg-blue-50/50 border border-blue-200 rounded-2xl">
+                    <h3 class="text-sm font-bold text-blue-900 mb-3">Butiran Item Tuntutan (Disemak)</h3>
+                    <div class="overflow-x-auto bg-white/60 rounded-lg border border-white/80">
+                        <table class="w-full text-left text-sm text-gray-700">
+                            <thead class="bg-blue-100/40 text-gray-800 text-xs font-semibold">
+                                <tr>
+                                    <th class="p-3">Turutan <br><span class="text-[9px] font-mono text-emerald-600 bg-emerald-100 px-1 rounded">tuntutan-seqno</span></th>
+                                    <th class="p-3">Perkara / Kategori <br><span class="text-[9px] font-mono text-emerald-600 bg-emerald-100 px-1 rounded">tnt-nama</span></th>
+                                    <th class="p-3 text-right">Amaun Dipohon (RM) <br><span class="text-[9px] font-mono text-emerald-600 bg-emerald-100 px-1 rounded">tuntutan-amt</span></th>
+                                    <th class="p-3 text-right">Amaun Lulus (RM) <br><span class="text-[9px] font-mono text-emerald-600 bg-emerald-100 px-1 rounded">tuntutan-amtlulus</span></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/60">
+                                <!-- Contoh 1 -->
+                                <tr>
+                                    <td class="p-3 text-center">1</td>
+                                    <td class="p-3">
+                                        <div class="font-medium">Ubat</div>
+                                        <a href="emedik-prototaip-2.1.1/resit/ubat.jpeg" target="_blank" rel="noopener" class="mt-1 inline-flex max-w-full items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-800 hover:bg-blue-100">
+                                            <span aria-hidden="true">&#128206;</span> Resit ubat.jpeg
+                                        </a>
+                                    </td>
+                                    <td class="p-3 text-right">500.00</td>
+                                    <td class="p-3 text-right font-medium text-emerald-700">500.00</td>
+                                </tr>
+                                <!-- Contoh 2 -->
+                                <tr>
+                                    <td class="p-3 text-center">2</td>
+                                    <td class="p-3">
+                                        <div class="font-medium">Rawatan</div>
+                                        <a href="emedik-prototaip-2.1.1/resit/INVOIS%20rawatan%20asal.jpeg" target="_blank" rel="noopener" class="mt-1 inline-flex max-w-full items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-800 hover:bg-blue-100">
+                                            <span aria-hidden="true">&#128206;</span> Invois rawatan asal.jpeg
+                                        </a>
+                                    </td>
+                                    <td class="p-3 text-right">450.00</td>
+                                    <td class="p-3 text-right font-medium text-emerald-700">450.00</td>
+                                </tr>
+                                <!-- Contoh 3 -->
+                                <tr>
+                                    <td class="p-3 text-center">3</td>
+                                    <td class="p-3">
+                                        <div class="font-medium">Alat Sokongan</div>
+                                        <a href="emedik-prototaip-2.1.1/resit/alatan.jpeg" target="_blank" rel="noopener" class="mt-1 inline-flex max-w-full items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-800 hover:bg-blue-100">
+                                            <span aria-hidden="true">&#128206;</span> Resit alat sokongan.jpeg
+                                        </a>
+                                    </td>
+                                    <td class="p-3 text-right">300.00</td>
+                                    <td class="p-3 text-right font-medium text-emerald-700">300.00</td>
+                                </tr>
+                                <tr class="bg-blue-100/30">
+                                    <td colspan="3" class="p-3 text-right font-bold text-gray-800">Jumlah Lulus Keseluruhan:</td>
+                                    <td class="p-3 text-right font-bold text-blue-700">RM 1,250.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tindakan Peringkat 3: Kemaskini Kod Perakaunan (FIS) -->
+                <div class="mt-6 border-t border-gray-300/50 pt-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Pengesahan Maklumat Kewangan (Integrasi FIS)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-teal-50/50 p-5 rounded-xl border border-teal-200">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Cawangan / PTJ (Branch) <span class="ml-2 text-[10px] font-mono text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded border border-emerald-200">fis-branch</span></label>
+                            <select x-model="ptjDipilih" @change="kodSubAkaun = ''" class="w-full bg-white/80 border border-teal-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-emerald-500">
+                                <option value="">Sila Pilih Kod PTJ...</option>
+                                <option value="B01">B01 - Jabatan Bendahari Induk</option>
+                                <option value="B02">B02 - Pusat Sejahtera</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Kod Lejar / Sub-Akaun <span class="ml-2 text-[10px] font-mono text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded border border-emerald-200">fis-subacc</span></label>
+                            <select x-model="kodSubAkaun" :disabled="!ptjDipilih" class="w-full bg-white/80 border border-teal-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400">
+                                <option value="" x-text="ptjDipilih ? 'Sila Pilih Kod Lejar / Sub-Akaun...' : 'Pilih PTJ terlebih dahulu...'">Pilih PTJ terlebih dahulu...</option>
+                                <template x-for="akaun in (subAkaunMengikutPtj[ptjDipilih] || [])" :key="akaun.kod">
+                                    <option :value="akaun.kod" x-text="akaun.kod"></option>
+                                </template>
+                            </select>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Status Kelulusan DP3 <span class="ml-2 text-[10px] font-mono text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded border border-emerald-200">tb-status</span></label>
+                            <select :disabled="!kodSubAkaun" class="w-full bg-white/80 border border-white/80 rounded-xl px-4 py-2 focus:ring-2 focus:ring-emerald-500 font-semibold text-gray-800 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400">
+                                <option value="">Sila Pilih Tindakan...</option>
+                                <option value="LULUS_DP3" selected>LULUS PERINGKAT 3</option>
+                                <option value="TOLAK_DP3">TOLAK / KEMBALIKAN</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Ulasan / Catatan <span class="ml-2 text-[10px] font-mono text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded border border-emerald-200">log-nota1</span></label>
+                            <textarea rows="2" placeholder="Catatan untuk kelulusan atau sebab penolakan..." class="w-full bg-white/80 border border-white/80 rounded-xl px-4 py-2 focus:ring-2 focus:ring-emerald-500"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 mt-8">
+                    <button type="button" @click="paparan = 'senarai'" class="bg-gray-200 hover:bg-gray-300 py-2 px-6 rounded-xl font-semibold shadow-sm transition">Batal</button>
+                    <button type="button" @click="paparan = 'senarai'; alert('Data dikemas kini. Komitmen kewangan dihantar ke FIS.')" class="bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-6 rounded-xl font-semibold shadow-md transition">Simpan Kelulusan DP 3</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- PAPARAN 3: BORANG KELULUSAN DP PERINGKAT 4 (SF-MDK-KL-DP-02)              -->
+        <!-- ========================================================================= -->
+        <div x-show="paparan === 'semakDP4'" style="display: none;" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-300/50 pb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Proses Kelulusan Dwi Peringkat 4 (Akhir)</h2>
+                <button @click="paparan = 'senarai'" class="text-gray-600 hover:text-gray-800 font-medium text-sm transition">&larr; Batal & Kembali</button>
+            </div>
+
+            <form class="space-y-6">
+                <!-- Maklumat Tuntutan & Akaun (Baca Sahaja) -->
+                <div class="p-5 bg-white/50 border border-white/80 rounded-2xl shadow-sm">
+                    <h3 class="text-sm font-bold text-gray-800 mb-4 border-b border-white pb-2">Ringkasan Tuntutan & Kod Perakaunan</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">ID Tuntutan <span class="ml-1 text-[9px] font-mono text-emerald-700 bg-emerald-100 px-1 rounded normal-case">tb-id</span></label>
+                            <p class="text-gray-800 font-medium">TP2026-0302</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Pemohon <span class="ml-1 text-[9px] font-mono text-emerald-700 bg-emerald-100 px-1 rounded normal-case">pemohon-nama</span></label>
+                            <p class="text-gray-800 font-medium">Nur Aina binti Hassan</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">No Kad Pengenalan <span class="ml-1 text-[9px] font-mono text-emerald-700 bg-emerald-100 px-1 rounded normal-case">pemohon-no-kp</span></label>
+                            <p class="text-gray-800 font-medium">900101-14-1234</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Kod PTJ <span class="ml-1 text-[9px] font-mono text-emerald-700 bg-emerald-100 px-1 rounded normal-case">fis-branch</span></label>
+                            <p class="text-gray-800 font-medium">B01</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Kod Sub-Akaun <span class="ml-1 text-[9px] font-mono text-emerald-700 bg-emerald-100 px-1 rounded normal-case">fis-subacc</span></label>
+                            <p class="text-gray-800 font-medium">12345-00000</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Jumlah Akhir Diluluskan <span class="ml-1 text-[9px] font-mono text-emerald-700 bg-emerald-100 px-1 rounded normal-case">tuntutan-amt</span></label>
+                            <p class="text-blue-700 font-bold text-lg">RM 9,750.00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-5 bg-blue-50/50 border border-blue-200 rounded-2xl">
+                    <h3 class="text-sm font-bold text-blue-900 mb-3">Butiran Item Tuntutan (Disemak)</h3>
+                    <div class="overflow-x-auto bg-white/60 rounded-lg border border-white/80">
+                        <table class="w-full text-left text-sm text-gray-700">
+                            <thead class="bg-blue-100/40 text-gray-800 text-xs font-semibold">
+                                <tr>
+                                    <th class="p-3">Turutan <br><span class="text-[9px] font-mono text-emerald-600 bg-emerald-100 px-1 rounded">tuntutan-seqno</span></th>
+                                    <th class="p-3">Perkara / Kategori <br><span class="text-[9px] font-mono text-emerald-600 bg-emerald-100 px-1 rounded">tnt-nama</span></th>
+                                    <th class="p-3 text-right">Amaun Dipohon (RM) <br><span class="text-[9px] font-mono text-emerald-600 bg-emerald-100 px-1 rounded">tuntutan-amt</span></th>
+                                    <th class="p-3 text-right">Amaun Lulus (RM) <br><span class="text-[9px] font-mono text-emerald-600 bg-emerald-100 px-1 rounded">tuntutan-amtlulus</span></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/60">
+                                <tr>
+                                    <td class="p-3 text-center">1</td>
+                                    <td class="p-3">
+                                        <div class="font-medium">Tambang Perjalanan</div>
+                                        <a href="emedik-prototaip-2.1.1/resit/tol.webp" target="_blank" rel="noopener" class="mt-1 inline-flex max-w-full items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-800 hover:bg-blue-100">
+                                            <span aria-hidden="true">&#128206;</span> Resit tol.webp
+                                        </a>
+                                    </td>
+                                    <td class="p-3 text-right">1,050.00</td>
+                                    <td class="p-3 text-right font-medium text-emerald-700">1,050.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-center">2</td>
+                                    <td class="p-3">
+                                        <div class="font-medium">Penginapan</div>
+                                        <a href="emedik-prototaip-2.1.1/resit/hotel%201.webp" target="_blank" rel="noopener" class="mt-1 inline-flex max-w-full items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-800 hover:bg-blue-100">
+                                            <span aria-hidden="true">&#128206;</span> Resit hotel 1.webp
+                                        </a>
+                                    </td>
+                                    <td class="p-3 text-right">450.00</td>
+                                    <td class="p-3 text-right font-medium text-emerald-700">450.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-center">3</td>
+                                    <td class="p-3">
+                                        <div class="font-medium">Penginapan (Malam 2)</div>
+                                        <a href="emedik-prototaip-2.1.1/resit/hotel%202.webp" target="_blank" rel="noopener" class="mt-1 inline-flex max-w-full items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-800 hover:bg-blue-100">
+                                            <span aria-hidden="true">&#128206;</span> Resit hotel 2.webp
+                                        </a>
+                                    </td>
+                                    <td class="p-3 text-right">375.00</td>
+                                    <td class="p-3 text-right font-medium text-emerald-700">375.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-center">4</td>
+                                    <td class="p-3">
+                                        <div class="font-medium">Rawatan</div>
+                                        <a href="emedik-prototaip-2.1.1/resit/rawatan.jpeg" target="_blank" rel="noopener" class="mt-1 inline-flex max-w-full items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-800 hover:bg-blue-100">
+                                            <span aria-hidden="true">&#128206;</span> Resit rawatan.jpeg
+                                        </a>
+                                    </td>
+                                    <td class="p-3 text-right">3,650.00</td>
+                                    <td class="p-3 text-right font-medium text-emerald-700">3,650.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-center">5</td>
+                                    <td class="p-3">
+                                        <div class="font-medium">Alat Sokongan</div>
+                                        <a href="emedik-prototaip-2.1.1/resit/alatan.jpeg" target="_blank" rel="noopener" class="mt-1 inline-flex max-w-full items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-800 hover:bg-blue-100">
+                                            <span aria-hidden="true">&#128206;</span> Resit alat sokongan.jpeg
+                                        </a>
+                                    </td>
+                                    <td class="p-3 text-right">4,225.00</td>
+                                    <td class="p-3 text-right font-medium text-emerald-700">4,225.00</td>
+                                </tr>
+                                <tr class="bg-blue-100/30">
+                                    <td colspan="3" class="p-3 text-right font-bold text-gray-800">Jumlah Lulus Keseluruhan:</td>
+                                    <td class="p-3 text-right font-bold text-blue-700">RM 9,750.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tindakan Peringkat 4: Pengesahan Akhir -->
+                <div class="mt-6 border-t border-gray-300/50 pt-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Pengesahan Kelulusan Akhir</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-indigo-50/50 p-5 rounded-xl border border-indigo-200">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Status Kelulusan DP4 <span class="ml-2 text-[10px] font-mono text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded border border-emerald-200">tb-status</span></label>
+                            <select x-model="statusDP4" class="w-full bg-white/80 border border-white/80 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-500 font-semibold text-gray-800">
+                                <option value="">Sila Pilih Tindakan Akhir...</option>
+                                <option value="LULUS_AKHIR">Lulus</option>
+                                <option value="HANTAR_DP3">Hantar semula kepada Peringkat 3</option>
+                                <option value="HANTAR_DP2">Hantar semula kepada Peringkat 2</option>
+                                <option value="HANTAR_PEMOHON" x-text="'Hantar semula kepada ' + namaPemohonDP4"></option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Ulasan / Catatan Akhir <span class="ml-2 text-[10px] font-mono text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded border border-emerald-200">log-nota1</span></label>
+                            <textarea rows="3" placeholder="Sila masukkan catatan kelulusan atau sebab penolakan..." class="w-full bg-white/80 border border-white/80 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 mt-8">
+                    <button type="button" @click="paparan = 'senarai'" class="bg-gray-200 hover:bg-gray-300 py-2 px-6 rounded-xl font-semibold shadow-sm transition">Batal</button>
+                    <button type="button" @click="simpanDP4()" :disabled="!statusDP4" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-xl font-semibold shadow-md transition disabled:cursor-not-allowed disabled:bg-gray-400">Simpan</button>
+                </div>
+            </form>
+        </div>
+
+        <div x-show="modalFIS" style="display: none;" @click.self="modalFIS = false" @keydown.escape.window="modalFIS = false" class="fixed inset-0 z-[60] flex items-center justify-center bg-gray-950/55 px-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="tajuk-modal-fis">
+            <div class="w-full max-w-md overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl shadow-gray-950/20">
+                    <div :class="statusDP4 === 'LULUS_AKHIR' ? 'bg-emerald-50' : 'bg-rose-50'" class="flex items-start gap-4 border-b border-gray-100 px-6 py-5">
+                    <div :class="statusDP4 === 'LULUS_AKHIR' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-xl font-bold" aria-hidden="true" x-text="statusDP4 === 'LULUS_AKHIR' ? '✓' : '!'">
+                    </div>
+                    <div class="min-w-0 flex-1 pt-1">
+                        <h2 id="tajuk-modal-fis" class="text-lg font-bold text-gray-900" x-text="statusDP4 === 'LULUS_AKHIR' ? 'Transaksi Berjaya' : 'Tuntutan Dihantar Semula'"></h2>
+                        <p class="mt-1 text-sm text-gray-600" x-text="statusDP4 === 'LULUS_AKHIR' ? 'Arahan bayaran telah dihantar ke sistem FIS.' : mesejStatusDP4()"></p>
+                    </div>
+                    <button type="button" @click="modalFIS = false" aria-label="Tutup modal" class="rounded-lg p-1 text-xl leading-none text-gray-400 hover:bg-white hover:text-gray-700">&times;</button>
+                </div>
+                <div class="px-6 py-5">
+                    <div x-show="statusDP4 === 'LULUS_AKHIR'" class="rounded-xl border border-emerald-200 bg-emerald-50/70 p-4">
+                        <p class="text-xs font-semibold uppercase text-emerald-800">No. Rujukan FIS</p>
+                        <p class="mt-1 font-mono text-2xl font-bold text-gray-900" x-text="noRujukanFIS"></p>
+                        <p class="mt-1 text-xs text-gray-600">Simpan nombor ini untuk semakan rujukan.</p>
+                    </div>
+                    <div class="mt-6 flex justify-end">
+                        <button type="button" @click="modalFIS = false; paparan = 'senarai'" class="min-w-24 rounded-lg bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

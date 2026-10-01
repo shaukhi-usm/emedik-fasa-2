@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eMedik - Profil Perbankan (Bagi Pihak)</title>
+    <!-- Rujukan CDN Online -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-100 via-blue-200 to-indigo-200 min-h-screen font-sans selection:bg-blue-300">
+
+    <!-- TopBar Navigation (Liquid Glass) -->
+    <nav class="bg-white/40 backdrop-blur-md border-b border-white/50 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center">
+                    <!-- Ditukar badge ke Pegawai BSM kerana modul ini diakses bagi pihak pengguna -->
+                    <span class="font-bold text-2xl text-gray-800 tracking-wide">eMedik <span class="text-blue-700 text-sm font-medium ml-1 px-2 py-1 bg-white/50 rounded-lg shadow-sm border border-white">Pegawai BSM</span></span>
+                </div>
+                
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-1">
+                        <a href="index.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Utama</a>
+                        <a href="tb.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Tuntutan Bayaran</a>
+                        <a href="tp.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Tuntutan Perjalanan</a>
+                        <a href="kk.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Tuntutan Kemudahan Kesihatan</a>
+                        <a href="bp.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Bagi Pihak</a>
+                        <a href="profil.html" class="bg-white/60 border border-white/50 text-blue-700 px-3 py-2 rounded-xl text-sm font-semibold shadow-sm">Profil Perbankan</a>
+                    </div>
+                </div>
+
+                <div>
+                    <a href="../index.html" class="bg-red-500/20 hover:bg-red-500/40 border border-red-200/50 text-red-700 px-5 py-2 rounded-xl text-sm font-bold transition duration-300 shadow-sm">Log Keluar</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alpine.js untuk kawalan modul Profil Perbankan -->
+    <main x-data="{ 
+            paparan: 'senarai',
+            carianProfil: '',
+            carianPengguna: '',
+            pemohonTerpilih: { ic: '', nama: '' },
+            
+            borangBank: '',
+            borangAkaun: '',
+
+            // Data Dummy Jadual (Dengan Nama & IC)
+            senaraiProfil: [
+                { id: 1, ic: '700101-01-1111', nama: 'Ahmad Bin Abu', bank: 'Maybank', acc: '1122334455', doc: 'Penyata_Akaun.pdf', status: 'Aktif (Diluluskan)', statusClass: 'bg-emerald-100 text-emerald-700 border border-emerald-200' },
+                { id: 2, ic: '710202-02-2222', nama: 'Siti Binti Kassim', bank: 'CIMB Bank', acc: '8899776655', doc: 'Buku_Bank.pdf', status: 'Sedang Diproses (Baharu)', statusClass: 'bg-blue-100 text-blue-700 border border-blue-200' },
+                { id: 3, ic: '720303-03-3333', nama: 'Ali Bin Omar', bank: 'Bank Islam Malaysia', acc: '1231231230', doc: 'Dokumen_Tidak_Jelas.pdf', status: 'Ditolak', statusClass: 'bg-red-100 text-red-700 border border-red-200' }
+            ],
+
+            // 20 Data Dummy Carian Pemohon
+            senaraiPengguna: [
+                { ic: '700101-01-1111', nama: 'Ahmad Bin Abu' },
+                { ic: '710202-02-2222', nama: 'Siti Binti Kassim' },
+                { ic: '720303-03-3333', nama: 'Ali Bin Omar' },
+                { ic: '730404-04-4444', nama: 'Fatimah Binti Awang' },
+                { ic: '740505-05-5555', nama: 'Kamal Bin Hassan' },
+                { ic: '750606-06-6666', nama: 'Zainab Binti Ismail' },
+                { ic: '760707-07-7777', nama: 'Othman Bin Ali' },
+                { ic: '770808-08-8888', nama: 'Rokiah Binti Bakar' },
+                { ic: '780909-09-9999', nama: 'Hussein Bin Onn' },
+                { ic: '791010-10-0000', nama: 'Mariam Binti Sulaiman' },
+                { ic: '801111-11-1111', nama: 'Razak Bin Mahmud' },
+                { ic: '811212-12-2222', nama: 'Aishah Binti Ramli' },
+                { ic: '820101-01-3333', nama: 'Bakar Bin Jalil' },
+                { ic: '830202-02-4444', nama: 'Salmah Binti Yusuf' },
+                { ic: '840303-03-5555', nama: 'Daud Bin Ibrahim' },
+                { ic: '850404-04-6666', nama: 'Zaleha Binti Harun' },
+                { ic: '860505-05-7777', nama: 'Yahya Bin Saad' },
+                { ic: '870606-06-8888', nama: 'Norhayati Binti Mat' },
+                { ic: '880707-07-9999', nama: 'Ismail Bin Majid' },
+                { ic: '890808-08-0000', nama: 'Halimah Binti Yaacob' }
+            ],
+
+            get hasilCarianPengguna() {
+                if (this.carianPengguna === '') return [];
+                let c = this.carianPengguna.toLowerCase();
+                return this.senaraiPengguna.filter(p => 
+                    p.nama.toLowerCase().includes(c) || p.ic.includes(c)
+                ).slice(0, 5); // Papar 5 hasil teratas
+            },
+
+            bukaCarianPemohon() {
+                this.carianPengguna = '';
+                this.paparan = 'carianPemohon';
+            },
+
+            pilihPemohonBagiPihak(user) {
+                this.pemohonTerpilih = user;
+                this.carianPengguna = '';
+                this.borangBank = '';
+                this.borangAkaun = '';
+                this.paparan = 'borang';
+            },
+
+            hantarPermohonan() {
+                if(!this.borangBank || !this.borangAkaun) {
+                    alert('Sila lengkapkan nama bank dan nombor akaun.');
+                    return;
+                }
+
+                // Tambah data baharu ke jadual
+                this.senaraiProfil.unshift({
+                    id: this.senaraiProfil.length + 1,
+                    ic: this.pemohonTerpilih.ic,
+                    nama: this.pemohonTerpilih.nama,
+                    bank: this.borangBank,
+                    acc: this.borangAkaun,
+                    doc: 'dokumen_sokongan_baru.pdf',
+                    status: 'Sedang Diproses (Baharu)',
+                    statusClass: 'bg-blue-100 text-blue-700 border border-blue-200'
+                });
+
+                alert('Permohonan kemaskini profil perbankan bagi pihak ' + this.pemohonTerpilih.nama + ' berjaya dihantar!');
+                this.paparan = 'senarai';
+            }
+        }" 
+        class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 relative">
+        
+        <!-- PAPARAN 1: SENARAI PROFIL PERBANKAN -->
+        <div x-show="paparan === 'senarai'" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+            <div class="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Senarai & Status Profil Perbankan</h2>
+                    <p class="text-sm text-gray-600 mt-1">Maklumat akaun bank pemohon untuk tujuan penerimaan tuntutan bayaran.</p>
+                </div>
+                <!-- Butang dilaraskan untuk membuka carian terlebih dahulu -->
+                <button @click="bukaCarianPemohon()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-5 rounded-xl shadow-md transition whitespace-nowrap">
+                    + Mohon Kemaskini Bank
+                </button>
+            </div>
+
+            <!-- FUNGSI CARIAN DATATABLE -->
+            <div class="mb-5 flex justify-end">
+                <div class="relative w-full md:w-1/3">
+                    <input type="text" x-model="carianProfil" placeholder="Tapis senarai profil..." class="w-full bg-white/80 border border-white/80 shadow-sm rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 font-medium text-gray-700">
+                    <svg class="w-5 h-5 text-gray-400 absolute left-3.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto bg-white/50 rounded-xl shadow-sm border border-white/40">
+                <table class="w-full text-left text-sm text-gray-700">
+                    <thead class="bg-blue-100/50 text-gray-800 font-semibold border-b border-white">
+                        <tr>
+                            <th class="p-4 w-16">Turutan <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">seqno</span></th>
+                            <!-- DIKEMASKINI: Kolum Nama Baharu -->
+                            <th class="p-4">Nama Pemohon <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">nama & ic</span></th>
+                            <th class="p-4">Nama Bank <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">bank-nama</span></th>
+                            <th class="p-4">No. Akaun <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">bank-accno</span></th>
+                            <th class="p-4">Dokumen Bukti <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">bank-fileid</span></th>
+                            <th class="p-4">Status Rekod <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">status-nama</span></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/40">
+                        <template x-for="(item, index) in senaraiProfil" :key="item.id">
+                            <!-- Tapisan Carian -->
+                            <tr class="hover:bg-white/40 transition" x-show="carianProfil === '' || (item.nama + ' ' + item.ic + ' ' + item.bank + ' ' + item.acc).toLowerCase().includes(carianProfil.toLowerCase())">
+                                <td class="p-4 font-medium text-center" x-text="senaraiProfil.length - index"></td>
+                                <!-- Data Kolum Nama -->
+                                <td class="p-4">
+                                    <div class="font-bold text-gray-800" x-text="item.nama"></div>
+                                    <div class="text-xs font-mono text-gray-500" x-text="item.ic"></div>
+                                </td>
+                                <td class="p-4 font-semibold text-indigo-800" x-text="item.bank"></td>
+                                <td class="p-4 font-mono font-medium text-gray-700" x-text="item.acc"></td>
+                                <td class="p-4"><a href="#" class="text-blue-600 hover:underline flex items-center"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> <span x-text="item.doc"></span></a></td>
+                                <td class="p-4">
+                                    <span :class="item.statusClass + ' px-2 py-1 rounded text-xs font-bold'" x-text="item.status"></span>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Info Tambahan -->
+            <div class="mt-6 p-4 bg-indigo-50/50 border border-indigo-200 rounded-xl">
+                <p class="text-xs text-indigo-800">
+                    <span class="font-bold">Nota:</span> Sebarang permohonan kemaskini profil perbankan perlulah disokong dengan dokumen yang sah (seperti salinan muka depan buku bank atau penyata bank) dan tertakluk kepada kelulusan pihak pengurusan.
+                </p>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- PAPARAN 2: CARIAN PEMOHON (BAGI PIHAK) -->
+        <!-- ========================================== -->
+        <div x-show="paparan === 'carianPemohon'" style="display: none;" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all relative max-w-3xl mx-auto">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-300/50 pb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Carian Pemohon (Bagi Pihak)</h2>
+                <button @click="paparan = 'senarai'" class="text-gray-600 hover:text-gray-800 font-medium text-sm transition">&larr; Batal</button>
+            </div>
+            
+            <div class="bg-white/60 p-6 rounded-2xl shadow-sm border border-white/80">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Sila buat carian menggunakan Nama atau No. Kad Pengenalan Pemohon</label>
+                <div class="relative mb-6">
+                    <input type="text" x-model="carianPengguna" placeholder="Cth: 700101-01-1111 atau Ahmad..." class="w-full bg-white border border-gray-300 rounded-xl pl-12 pr-4 py-3 focus:ring-2 focus:ring-blue-500 font-medium text-gray-800 shadow-sm">
+                    <svg class="w-6 h-6 text-gray-400 absolute left-4 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                
+                <div x-show="carianPengguna !== ''" class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm transition-all">
+                    <ul class="divide-y divide-gray-100 max-h-64 overflow-y-auto">
+                        <template x-for="user in hasilCarianPengguna" :key="user.ic">
+                            <li @click="pilihPemohonBagiPihak(user)" class="p-4 hover:bg-blue-50 cursor-pointer transition flex items-center space-x-4">
+                                <div class="bg-blue-100 text-blue-600 p-2.5 rounded-xl border border-blue-200 shadow-sm">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                </div>
+                                <div>
+                                    <!-- Format (######-##-####) Nama -->
+                                    <p class="text-base font-bold text-gray-800" x-text="`(${user.ic}) ${user.nama}`"></p>
+                                    <p class="text-xs text-gray-500 font-medium">Klik untuk teruskan kemaskini bank</p>
+                                </div>
+                            </li>
+                        </template>
+                        <li x-show="hasilCarianPengguna.length === 0" class="p-5 text-center text-sm text-gray-500 italic">
+                            Tiada rekod pemohon dijumpai untuk carian ini.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- PAPARAN 3: BORANG PERMOHONAN KEMASKINI PROFIL -->
+        <!-- ========================================== -->
+        <div x-show="paparan === 'borang'" style="display: none;" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-300/50 pb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Borang Kemaskini Profil Perbankan</h2>
+                <button @click="bukaCarianPemohon()" class="text-gray-600 hover:text-gray-800 font-medium text-sm transition">&larr; Tukar Pemohon</button>
+            </div>
+
+            <form class="space-y-6">
+                
+                <!-- Maklumat Pemohon Dipilih -->
+                <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 flex items-center space-x-3 mb-6">
+                    <div class="bg-white p-2 rounded-lg border border-indigo-200 shadow-sm text-indigo-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5">Pemohon Dipilih (Bagi Pihak)</p>
+                        <p class="text-sm font-bold text-gray-800" x-text="pemohonTerpilih.nama"></p>
+                        <p class="text-xs font-mono text-gray-600" x-text="pemohonTerpilih.ic"></p>
+                    </div>
+                </div>
+
+                <!-- Entiti Rujukan DFD: PU_BANK_INFO -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-blue-50/50 border border-blue-200 rounded-2xl">
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            Nama Bank 
+                            <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">bank-nama</span>
+                        </label>
+                        <select x-model="borangBank" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 text-gray-700 font-semibold">
+                            <option value="">Sila Pilih Bank Baru...</option>
+                            <option value="Bank Islam Malaysia">Bank Islam Malaysia</option>
+                            <option value="Bank Muamalat">Bank Muamalat</option>
+                            <option value="CIMB Bank">CIMB Bank</option>
+                            <option value="Maybank">Maybank</option>
+                            <option value="Public Bank">Public Bank</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            No. Akaun Bank 
+                            <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">bank-accno</span>
+                        </label>
+                        <input type="text" x-model="borangAkaun" placeholder="Masukkan nombor akaun tanpa sengkang (-)" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div class="md:col-span-2 mt-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            Dokumen Sokongan (Buku Bank / Penyata Akaun) 
+                            <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">bank-fileid</span>
+                        </label>
+                        <div class="flex items-center justify-center w-full">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-blue-300 border-dashed rounded-xl cursor-pointer bg-white hover:bg-blue-50 transition shadow-sm">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <svg class="w-8 h-8 mb-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                    <p class="mb-2 text-sm text-gray-500"><span class="font-semibold text-blue-600">Klik untuk muat naik</span> atau seret fail ke sini</p>
+                                    <p class="text-xs text-gray-500">PDF, JPG atau PNG (Maks: 2MB)</p>
+                                </div>
+                                <input type="file" class="hidden" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 mt-8 border-t border-gray-300/50 pt-6">
+                    <button type="button" @click="paparan = 'senarai'" class="bg-gray-200 hover:bg-gray-300 py-2 px-6 rounded-xl font-semibold shadow-sm transition text-gray-700">
+                        Batal
+                    </button>
+                    <button type="button" @click="hantarPermohonan()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-xl font-semibold shadow-md transition">
+                        Hantar Permohonan
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </main>
+</body>
+</html>

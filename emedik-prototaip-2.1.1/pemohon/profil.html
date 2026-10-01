@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eMedik - Profil Perbankan (Pemohon)</title>
+    <!-- Rujukan CDN Online -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-100 via-blue-200 to-indigo-200 min-h-screen font-sans selection:bg-blue-300">
+
+    <!-- TopBar Navigation (Liquid Glass) -->
+    <nav class="bg-white/40 backdrop-blur-md border-b border-white/50 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center">
+                    <span class="font-bold text-2xl text-gray-800 tracking-wide">eMedik <span class="text-blue-700 text-sm font-medium ml-1 px-2 py-1 bg-white/50 rounded-lg">Pemohon</span></span>
+                </div>
+                
+                <!-- Menu Navigasi (Telah ditambah pautan 'Utama') -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-1">
+                        <!-- Pautan Utama Dikembalikan -->
+                        <a href="index.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Utama</a>
+                        
+                        <a href="tb.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Tuntutan Bayaran</a>
+                        <a href="tp.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Tuntutan Perjalanan</a>
+                        <a href="profil.html" class="bg-white/60 border border-white/50 text-blue-700 px-3 py-2 rounded-xl text-sm font-semibold shadow-sm">Profil Perbankan</a>
+                    </div>
+                </div>
+
+                <div>
+                    <a href="../index.html" class="bg-red-500/20 hover:bg-red-500/40 border border-red-200/50 text-red-700 px-5 py-2 rounded-xl text-sm font-bold transition duration-300 shadow-sm">Log Keluar</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alpine.js untuk kawalan modul Profil Perbankan -->
+    <main x-data="{ paparan: 'senarai' }" class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        
+        <!-- PAPARAN 1: SENARAI PROFIL PERBANKAN -->
+        <div x-show="paparan === 'senarai'" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Senarai & Status Profil Perbankan</h2>
+                    <p class="text-sm text-gray-600 mt-1">Maklumat akaun bank anda untuk tujuan penerimaan tuntutan bayaran.</p>
+                </div>
+                <button @click="paparan = 'borang'" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition">
+                    + Mohon Kemaskini Bank
+                </button>
+            </div>
+
+            <div class="overflow-x-auto bg-white/50 rounded-xl shadow-sm border border-white/40">
+                <table class="w-full text-left text-sm text-gray-700">
+                    <thead class="bg-blue-100/50 text-gray-800 font-semibold border-b border-white">
+                        <tr>
+                            <th class="p-4">Turutan <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">bank-seqno</span></th>
+                            <th class="p-4">Nama Bank <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">bank-nama</span></th>
+                            <th class="p-4">No. Akaun <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">bank-accno</span></th>
+                            <th class="p-4">Dokumen Bukti <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">bank-fileid</span></th>
+                            <th class="p-4">Status Rekod <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">status-nama</span></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/40">
+                        <!-- Contoh 1: Diluluskan -->
+                        <tr class="hover:bg-white/40 transition">
+                            <td class="p-4 font-medium">1</td>
+                            <td class="p-4 font-semibold text-gray-800">Maybank</td>
+                            <td class="p-4">1122334455</td>
+                            <td class="p-4"><a href="#" class="text-blue-600 hover:underline">Penyata_Akaun.pdf</a></td>
+                            <td class="p-4"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-semibold">Aktif (Diluluskan)</span></td>
+                        </tr>
+                        <!-- Contoh 2: Dalam Proses -->
+                        <tr class="hover:bg-white/40 transition">
+                            <td class="p-4 font-medium">2</td>
+                            <td class="p-4 font-semibold text-gray-800">CIMB Bank</td>
+                            <td class="p-4">8899776655</td>
+                            <td class="p-4"><a href="#" class="text-blue-600 hover:underline">Buku_Bank.pdf</a></td>
+                            <td class="p-4"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">Sedang Diproses (Baharu)</span></td>
+                        </tr>
+                        <!-- Contoh 3: Ditolak -->
+                        <tr class="hover:bg-white/40 transition">
+                            <td class="p-4 font-medium">3</td>
+                            <td class="p-4 font-semibold text-gray-800">Bank Islam Malaysia</td>
+                            <td class="p-4">1231231230</td>
+                            <td class="p-4"><a href="#" class="text-blue-600 hover:underline">Dokumen_Tidak_Jelas.pdf</a></td>
+                            <td class="p-4"><span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-semibold">Ditolak</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Info Tambahan -->
+            <div class="mt-6 p-4 bg-indigo-50/50 border border-indigo-200 rounded-xl">
+                <p class="text-xs text-indigo-800">
+                    <span class="font-bold">Nota:</span> Sebarang permohonan kemaskini profil perbankan perlulah disokong dengan dokumen yang sah (seperti salinan muka depan buku bank atau penyata bank) dan tertakluk kepada kelulusan pihak pengurusan.
+                </p>
+            </div>
+        </div>
+
+        <!-- PAPARAN 2: BORANG PERMOHONAN KEMASKINI PROFIL PERBANKAN -->
+        <div x-show="paparan === 'borang'" style="display: none;" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-300/50 pb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Borang Kemaskini Profil Perbankan</h2>
+                <button @click="paparan = 'senarai'" class="text-gray-600 hover:text-gray-800 font-medium text-sm transition">&larr; Batal & Kembali</button>
+            </div>
+
+            <form class="space-y-6">
+                <!-- Entiti Rujukan DFD: PU_BANK_INFO -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-blue-50/50 border border-blue-200 rounded-2xl">
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            Nama Bank 
+                            <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">bank-nama</span>
+                        </label>
+                        <select class="w-full bg-white/80 border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 text-gray-700">
+                            <option value="">Sila Pilih Bank Baru...</option>
+                            <option value="Bank Islam Malaysia">Bank Islam Malaysia</option>
+                            <option value="Bank Muamalat">Bank Muamalat</option>
+                            <option value="CIMB Bank">CIMB Bank</option>
+                            <option value="Maybank">Maybank</option>
+                            <option value="Public Bank">Public Bank</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            No. Akaun Bank 
+                            <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">bank-accno</span>
+                        </label>
+                        <input type="text" placeholder="Masukkan nombor akaun tanpa sengkang (-)" class="w-full bg-white/80 border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div class="md:col-span-2 mt-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            Dokumen Sokongan (Buku Bank / Penyata Akaun) 
+                            <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">bank-fileid</span>
+                        </label>
+                        <div class="flex items-center justify-center w-full">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-blue-300 border-dashed rounded-xl cursor-pointer bg-white/60 hover:bg-blue-50 transition">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <svg class="w-8 h-8 mb-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                    <p class="mb-2 text-sm text-gray-500"><span class="font-semibold text-blue-600">Klik untuk muat naik</span> atau seret fail ke sini</p>
+                                    <p class="text-xs text-gray-500">PDF, JPG atau PNG (Maks: 2MB)</p>
+                                </div>
+                                <input type="file" class="hidden" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 mt-8 border-t border-gray-300/50 pt-6">
+                    <button type="button" @click="paparan = 'senarai'" class="bg-gray-200 hover:bg-gray-300 py-2 px-6 rounded-xl font-semibold shadow-sm transition">
+                        Batal
+                    </button>
+                    <button type="button" @click="paparan = 'senarai'; alert('Permohonan kemaskini profil perbankan berjaya dihantar untuk kelulusan!');" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-xl font-semibold shadow-md transition">
+                        Hantar Permohonan
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </main>
+</body>
+</html>

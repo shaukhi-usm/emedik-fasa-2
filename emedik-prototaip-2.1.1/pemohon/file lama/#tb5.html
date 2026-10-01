@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eMedik - Tuntutan Bayaran (Pemohon)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        /* Sembunyikan scrollbar untuk paparan modal yang lebih kemas */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-100 via-blue-200 to-indigo-200 min-h-screen font-sans selection:bg-blue-300">
+
+    <nav class="bg-white/40 backdrop-blur-md border-b border-white/50 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center">
+                    <span class="font-bold text-2xl text-gray-800 tracking-wide">eMedik <span class="text-blue-700 text-sm font-medium ml-1 px-2 py-1 bg-white/50 rounded-lg">Pemohon</span></span>
+                </div>
+                
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-1">
+                        <a href="index.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Utama</a>
+                        <a href="tb.html" class="bg-white/60 border border-white/50 text-blue-700 px-3 py-2 rounded-xl text-sm font-semibold shadow-sm">Tuntutan Bayaran</a>
+                        <a href="tp.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Tuntutan Perjalanan</a>
+                        <a href="kk.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Tuntutan Kemudahan Kesihatan</a>
+                        <a href="bp.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Bagi Pihak</a>
+                        <a href="profil.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Profil Perbankan</a>
+                    </div>
+                </div>
+
+                <div>
+                    <a href="../index.html" class="bg-red-500/20 hover:bg-red-500/40 border border-red-200/50 text-red-700 px-5 py-2 rounded-xl text-sm font-bold transition duration-300 shadow-sm">Log Keluar</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main x-data="{ 
+            paparan: 'senaraiTB', 
+            maxItem: 3, 
+            senaraiTuntutan: [],
+            
+            showModal: false,
+            showModalAkaun: false,
+            akaunPilihan: '',
+            
+            // Tarikh Hari Ini untuk had input date (max)
+            todayDate: new Date().toISOString().split('T')[0],
+
+            // Data Kelayakan Asal
+            kelayakanSK: [
+                { id: 'UBAT', nama: '1. Ubat', totalApprove: 10000.00, totalClaimed: 0.00, balanceClaim: 10000.00, expiredDate: '01/01/2028' },
+                { id: 'RAWATAN', nama: '2. Rawatan', totalApprove: 150000.00, totalClaimed: 45000.00, balanceClaim: 105000.00, expiredDate: '01/01/2027' },
+                { id: 'ALATAN', nama: '3. Alatan', totalApprove: 10000.00, totalClaimed: 0.00, balanceClaim: 10000.00, expiredDate: '01/01/2028' }
+            ],
+
+            tempItem: { kategori: '', tarikh: '', amaun: '', diskripsi: '' },
+
+            // Fungsi untuk mengira nilai jadual secara dinamik
+            getDynamicKelayakan(katId) {
+                let base = this.kelayakanSK.find(k => k.id === katId);
+                if(!base) return null;
+                
+                let pending = this.senaraiTuntutan.find(t => t.kategori === katId);
+                let pendingAmt = pending ? parseFloat(pending.amaun || 0) : 0;
+                
+                return {
+                    ...base,
+                    totalClaimedReal: base.totalClaimed + pendingAmt,
+                    balanceClaimReal: base.balanceClaim - pendingAmt
+                };
+            },
+
+            // Dapatkan senarai kategori yang belum dipilih
+            get kategoriBolehPilih() {
+                const kategoriDigunakan = this.senaraiTuntutan.map(item => item.kategori);
+                return this.kelayakanSK.filter(kat => !kategoriDigunakan.includes(kat.id));
+            },
+
+            // Dapatkan baki semasa untuk kategori yang dipilih di dalam Modal
+            get currentBalanceKategori() {
+                if(!this.tempItem.kategori) return 0.00;
+                let data = this.getDynamicKelayakan(this.tempItem.kategori);
+                return data ? data.balanceClaimReal : 0.00;
+            },
+
+            bukaModal() {
+                if (this.senaraiTuntutan.length >= this.maxItem) {
+                    alert('Maksimum tuntutan (' + this.maxItem + ' item) telah dicapai.');
+                    return;
+                }
+                if (this.kategoriBolehPilih.length === 0) {
+                    alert('Semua kategori telah dituntut.');
+                    return;
+                }
+                this.tempItem = { kategori: '', tarikh: '', amaun: '', diskripsi: '' };
+                this.showModal = true;
+            },
+
+            simpanTuntutan() {
+                if(!this.tempItem.kategori || !this.tempItem.tarikh || !this.tempItem.amaun) {
+                    alert('Sila isi maklumat wajib (Kategori, Tarikh, Amaun).');
+                    return;
+                }
+                
+                if (this.tempItem.tarikh > this.todayDate) {
+                    alert('Ralat: Tarikh rawatan tidak boleh melebihi tarikh hari ini.');
+                    return;
+                }
+
+                if (parseFloat(this.tempItem.amaun) > this.currentBalanceKategori) {
+                    alert('Ralat: Nilai tuntutan (RM ' + parseFloat(this.tempItem.amaun).toFixed(2) + ') melebihi baki yang dibenarkan.');
+                    return;
+                }
+
+                this.tempItem.id = Date.now();
+                this.senaraiTuntutan.push({...this.tempItem}); 
+                this.showModal = false; 
+            },
+
+            buangTuntutan(index) {
+                this.senaraiTuntutan.splice(index, 1);
+            },
+
+            hantarPermohonan() {
+                if(!this.akaunPilihan) {
+                    alert('Sila buat pilihan akaun penerima terlebih dahulu.');
+                    return;
+                }
+                alert('Tuntutan Berjaya Dihantar ke ' + (this.akaunPilihan === 'STAF' ? 'Akaun Staf' : 'Akaun Waris') + '!');
+                this.senaraiTuntutan = [];
+                this.showModalAkaun = false;
+                this.akaunPilihan = '';
+                this.paparan = 'senaraiTB';
+            }
+        }" 
+        class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 relative">
+        
+        <div x-show="paparan === 'senaraiTB'" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Senarai Tuntutan Bayaran (TB)</h2>
+                    <p class="text-sm text-gray-600 mt-1">Sejarah permohonan tuntutan bayaran anda.</p>
+                </div>
+                <button @click="paparan = 'senaraiSK'" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition">
+                    + Mohon TB Baharu
+                </button>
+            </div>
+
+            <div class="overflow-x-auto bg-white/50 rounded-xl shadow-sm border border-white/40">
+                <table class="w-full text-left text-sm text-gray-700">
+                    <thead class="bg-blue-100/50 text-gray-800 font-semibold border-b border-white">
+                        <tr>
+                            <th class="p-4">ID TB <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">tb-id</span></th>
+                            <th class="p-4">Tarikh <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">tarikh-tb</span></th>
+                            <th class="p-4">Amaun (RM) <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">sum(tuntutan-amt)</span></th>
+                            <th class="p-4">Status <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">status-nama</span></th>
+                            <th class="p-4 text-center">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/40">
+                        <tr class="hover:bg-white/40 transition">
+                            <td class="p-4 font-medium">TB2026-0001</td>
+                            <td class="p-4">12 Jan 2026</td>
+                            <td class="p-4">150.00</td>
+                            <td class="p-4"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-semibold">Diluluskan</span></td>
+                            <td class="p-4 text-center"><button @click="paparan = 'paparTB'" class="text-blue-600 hover:underline text-xs font-semibold">Papar</button></td>
+                        </tr>
+                        <tr class="hover:bg-white/40 transition">
+                            <td class="p-4 font-medium">TB2026-0045</td>
+                            <td class="p-4">18 Feb 2026</td>
+                            <td class="p-4">300.50</td>
+                            <td class="p-4"><span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-xs font-semibold">Hantar Semula</span></td>
+                            <td class="p-4 text-center">
+                                <button @click="paparan = 'borangTB'; senaraiTuntutan = [];" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded-lg text-xs font-semibold transition shadow-sm">Kemaskini</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div x-show="paparan === 'senaraiSK'" style="display: none;" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Pilih Surat Kelulusan (SK)</h2>
+                    <p class="text-sm text-gray-600 mt-1">Sila pilih Surat Kelulusan yang sah untuk meneruskan tuntutan bayaran.</p>
+                </div>
+                <button @click="paparan = 'senaraiTB'" class="text-gray-600 hover:text-gray-800 font-medium text-sm transition">&larr; Kembali</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white/50 border border-white/50 p-6 rounded-2xl shadow-sm hover:shadow-lg transition">
+                    <div class="flex justify-between items-start mb-4 border-b border-white/50 pb-3">
+                        <div>
+                            <span class="font-bold text-lg text-gray-800 block">SK2026-0992</span>
+                            <span class="text-[10px] font-mono text-emerald-600 bg-emerald-100 px-1 rounded">sk-id</span>
+                        </div>
+                        <span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-semibold">Aktif</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-1"><span class="font-semibold text-gray-700">Pesakit:</span> Ahmad Bin Abu</p>
+                    <p class="text-sm text-gray-600 mb-1"><span class="font-semibold text-gray-700">No. Invois / Resit:</span> INV-77210</p>
+                    <p class="text-sm text-gray-600 mb-1"><span class="font-semibold text-gray-700">Matawang:</span> MYR - Ringgit Malaysia</p>
+                    <p class="text-sm text-gray-600 mb-4"><span class="font-semibold text-gray-700">Tarikh SK:</span> 01 Januari 2026</p>
+                    <button @click="paparan = 'borangTB'; senaraiTuntutan = [];" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl shadow-sm transition text-sm">
+                        Teruskan dengan SK ini
+                    </button>
+                </div>
+
+                <div class="bg-white/50 border border-white/50 p-6 rounded-2xl shadow-sm hover:shadow-lg transition">
+                    <div class="flex justify-between items-start mb-4 border-b border-white/50 pb-3">
+                        <div>
+                            <span class="font-bold text-lg text-gray-800 block">SK2026-1005</span>
+                            <span class="text-[10px] font-mono text-emerald-600 bg-emerald-100 px-1 rounded">sk-id</span>
+                        </div>
+                        <span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-semibold">Aktif</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-1"><span class="font-semibold text-gray-700">Pesakit:</span> Ahmad Bin Abu</p>
+                    <p class="text-sm text-gray-600 mb-1"><span class="font-semibold text-gray-700">No. Invois / Resit:</span> INV-44582</p>
+                    <p class="text-sm text-gray-600 mb-1"><span class="font-semibold text-gray-700">Matawang:</span> MYR - Ringgit Malaysia</p>
+                    <p class="text-sm text-gray-600 mb-4"><span class="font-semibold text-gray-700">Tarikh SK:</span> 15 Februari 2026</p>
+                    <button @click="paparan = 'borangTB'; senaraiTuntutan = [];" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl shadow-sm transition text-sm">
+                        Teruskan dengan SK ini
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div x-show="paparan === 'borangTB'" style="display: none;" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all relative">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-300/50 pb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Borang Tuntutan Bayaran</h2>
+                <button @click="paparan = 'senaraiSK'; senaraiTuntutan = [];" class="text-gray-600 hover:text-gray-800 font-medium text-sm transition">&larr; Tukar SK / Batal</button>
+            </div>
+
+            <div class="mb-4 bg-white/50 rounded-2xl shadow-sm border border-white/60 overflow-hidden">
+                <div class="bg-blue-100/50 p-4 border-b border-white">
+                    <h3 class="text-sm font-bold text-gray-800">Maklumat Kelayakan (Surat Kelulusan: SK2026-0992)</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-gray-700">
+                        <thead class="bg-blue-50/50 text-gray-800 font-semibold border-b border-white">
+                            <tr>
+                                <th class="p-4">Jenis Tuntutan</th>
+                                <th class="p-4 text-right">Total Approve (RM)</th>
+                                <th class="p-4 text-right">Total Claimed (RM)</th>
+                                <th class="p-4 text-right">Balance Claim (RM)</th>
+                                <th class="p-4 text-center">Expired Date</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/40">
+                            <template x-for="kat in kelayakanSK" :key="kat.id">
+                                <tr class="hover:bg-white/40 transition">
+                                    <td class="p-4 font-medium" x-text="kat.nama"></td>
+                                    <td class="p-4 text-right" x-text="kat.totalApprove.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')"></td>
+                                    <td class="p-4 text-right text-amber-700 font-semibold" x-text="getDynamicKelayakan(kat.id).totalClaimedReal.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')"></td>
+                                    <td class="p-4 text-right text-emerald-700 font-bold" x-text="getDynamicKelayakan(kat.id).balanceClaimReal.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')"></td>
+                                    <td class="p-4 text-center" x-text="kat.expiredDate"></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="flex justify-center mb-8 mt-6">
+                <button type="button" @click="bukaModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-xl shadow-md transition flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <span>Tuntutan Baharu</span>
+                </button>
+            </div>
+
+            <div x-show="senaraiTuntutan.length > 0" style="display: none;" class="mb-8">
+                <h3 class="text-lg font-bold text-gray-800 mb-3 border-b border-gray-300/50 pb-2">Item Yang Akan Dituntut</h3>
+                <div class="overflow-x-auto bg-white/60 rounded-xl shadow-sm border border-white/80">
+                    <table class="w-full text-left text-sm text-gray-700">
+                        <thead class="bg-blue-100/40 text-gray-800 font-semibold border-b border-white">
+                            <tr>
+                                <th class="p-3">Kategori</th>
+                                <th class="p-3">Tarikh Rawatan</th>
+                                <th class="p-3 text-right">Amaun (RM)</th>
+                                <th class="p-3 text-center">Tindakan</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/60">
+                            <template x-for="(item, index) in senaraiTuntutan" :key="item.id">
+                                <tr class="hover:bg-white/40 transition">
+                                    <td class="p-3 font-semibold text-blue-700" x-text="item.kategori"></td>
+                                    <td class="p-3" x-text="item.tarikh"></td>
+                                    <td class="p-3 text-right font-semibold text-emerald-700" x-text="parseFloat(item.amaun).toFixed(2)"></td>
+                                    <td class="p-3 text-center">
+                                        <button type="button" @click="buangTuntutan(index)" class="text-red-500 hover:text-red-700 font-semibold bg-red-50 px-2 py-1 rounded">Padam</button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div x-show="senaraiTuntutan.length > 0" style="display: none;" class="flex justify-end space-x-3 mt-8 border-t border-gray-300/50 pt-6">
+                <button type="button" @click="paparan = 'senaraiTB'; senaraiTuntutan = [];" class="bg-gray-200 hover:bg-gray-300 py-2 px-6 rounded-xl font-semibold shadow-sm transition">Batal Keseluruhan</button>
+                <button type="button" @click="showModalAkaun = true" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-xl font-semibold shadow-md transition">Hantar Permohonan</button>
+            </div>
+            
+            <div x-show="showModal" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" @click="showModal = false" x-transition.opacity></div>
+                
+                <div class="relative bg-white/70 backdrop-blur-3xl border border-white/80 shadow-2xl rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto no-scrollbar" x-transition>
+                    <div class="p-8">
+                        <div class="flex justify-between items-center mb-6 border-b border-gray-300/50 pb-4">
+                            <h2 class="text-2xl font-bold text-gray-800">Borang Item Tuntutan</h2>
+                            <button type="button" @click="showModal = false" class="text-gray-500 hover:text-red-500">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+
+                        <form class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Kategori Item <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">tnt-id</span></label>
+                                    <select x-model="tempItem.kategori" class="w-full bg-white/80 border border-white/80 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Sila Pilih...</option>
+                                        <template x-for="kat in kategoriBolehPilih" :key="kat.id">
+                                            <option :value="kat.id" x-text="kat.nama"></option>
+                                        </template>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tarikh Rawatan <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">tarikh-rawatan</span></label>
+                                    <input type="date" x-model="tempItem.tarikh" :max="todayDate" class="w-full bg-white/80 border border-white/80 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Amaun Tuntutan (RM) <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">tuntutan-amt</span></label>
+                                    <input type="number" step="0.01" x-model="tempItem.amaun" placeholder="0.00" class="w-full bg-white/80 border border-white/80 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Baki Kelayakan (RM)</label>
+                                    <input type="text" x-bind:value="currentBalanceKategori.toFixed(2)" readonly class="w-full bg-gray-100/60 text-emerald-800 font-bold border border-white/80 rounded-xl px-4 py-2 cursor-not-allowed">
+                                </div>
+                            </div>
+
+                            <div x-show="parseFloat(tempItem.amaun || 0) > currentBalanceKategori && tempItem.kategori !== ''" style="display: none;" class="p-3 bg-red-50 border border-red-200 rounded-lg">
+                                <p class="text-xs text-red-600 font-semibold flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                    Amaran: Nilai tuntutan yang diisi melebihi baki yang dibenarkan!
+                                </p>
+                            </div>
+
+                            <div class="mt-4">
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Diskripsi <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded">tb-diskripsi</span></label>
+                                <textarea rows="2" x-model="tempItem.diskripsi" class="w-full bg-white/80 border border-white/80 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500"></textarea>
+                            </div>
+
+                            <div class="flex justify-end space-x-3 mt-6 border-t border-gray-300/50 pt-4">
+                                <button type="button" @click="showModal = false" class="bg-gray-200 hover:bg-gray-300 py-2 px-6 rounded-xl font-semibold transition">Batal</button>
+                                <button type="button" 
+                                    @click="simpanTuntutan()" 
+                                    :disabled="parseFloat(tempItem.amaun || 0) > currentBalanceKategori" 
+                                    :class="parseFloat(tempItem.amaun || 0) > currentBalanceKategori ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'bg-indigo-600 hover:bg-indigo-700'" 
+                                    class="text-white py-2 px-6 rounded-xl font-semibold shadow-md transition">
+                                    Simpan ke Senarai
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div x-show="showModalAkaun" style="display: none;" class="fixed inset-0 z-[105] flex items-center justify-center p-4">
+                <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" @click="showModalAkaun = false" x-transition.opacity></div>
+
+                <div class="relative bg-white/70 backdrop-blur-3xl border border-white/80 shadow-2xl rounded-3xl w-full max-w-lg p-8" x-transition>
+                    <div class="flex justify-between items-center mb-6 border-b border-gray-300/50 pb-4">
+                        <h2 class="text-xl font-bold text-gray-800">Pengesahan Akaun Penerima</h2>
+                        <button type="button" @click="showModalAkaun = false" class="text-gray-500 hover:text-red-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <p class="text-sm font-medium text-gray-700">Sila tetapkan pilihan akaun penerima bagi pembayaran tuntutan ini sebelum permohonan dihantar:</p>
+
+                        <div class="bg-blue-50/50 border border-blue-200 rounded-xl p-4 space-y-3">
+                            <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-white/50 rounded-lg transition">
+                                <input type="radio" x-model="akaunPilihan" value="STAF" class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                <span class="text-gray-800 font-semibold text-sm">Akaun Staf <span class="text-gray-500 font-normal">(Ahmad Bin Abu)</span></span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-white/50 rounded-lg transition">
+                                <input type="radio" x-model="akaunPilihan" value="WARIS" class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                <span class="text-gray-800 font-semibold text-sm">Akaun Waris <span class="text-gray-500 font-normal">(Siti Binti Abu)</span></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-3 mt-8 border-t border-gray-300/50 pt-6">
+                        <button type="button" @click="showModalAkaun = false" class="bg-gray-200 hover:bg-gray-300 py-2 px-6 rounded-xl font-semibold transition shadow-sm">Batal</button>
+                        <button type="button" @click="hantarPermohonan()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-xl font-semibold shadow-md transition">Sahkan & Hantar</button>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+        <div x-show="paparan === 'paparTB'" style="display: none;" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-300/50 pb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Maklumat Tuntutan Bayaran</h2>
+                <button @click="paparan = 'senaraiTB'" class="text-gray-600 hover:text-gray-800 font-medium text-sm transition">&larr; Kembali</button>
+            </div>
+
+            <div class="bg-white/50 rounded-xl p-6 border border-white/60 space-y-4 shadow-sm">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-semibold">ID Tuntutan</p>
+                        <p class="text-gray-800 font-medium">TB2026-0001</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-semibold">Status</p>
+                        <p class="text-emerald-700 font-medium bg-emerald-100 px-2 py-0.5 rounded inline-block text-sm">Diluluskan</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

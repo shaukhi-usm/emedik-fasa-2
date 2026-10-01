@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eMedik - Papan Pemuka (Pemohon)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-100 via-blue-200 to-indigo-200 min-h-screen font-sans selection:bg-blue-300">
+
+    <div x-data="{ modul: 'TP', paparan: 'senaraiTP' }">
+
+        <nav class="bg-white/40 backdrop-blur-md border-b border-white/50 sticky top-0 z-50 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-20">
+                    <div class="flex items-center">
+                        <span class="font-bold text-2xl text-gray-800 tracking-wide">eMedik <span class="text-blue-700 text-sm font-medium ml-1 px-2 py-1 bg-white/50 rounded-lg">Pemohon</span></span>
+                    </div>
+                    
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-2">
+                            <a href="#" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-4 py-2 rounded-xl text-sm font-medium transition duration-300">Utama</a>
+                            <a href="#" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-4 py-2 rounded-xl text-sm font-medium transition duration-300">Surat Kelulusan (SK)</a>
+                            
+                            <button @click="modul = 'TB'; paparan = 'senaraiTB'" 
+                                    :class="modul === 'TB' ? 'bg-white/60 border border-white/50 text-blue-700 shadow-sm' : 'text-gray-700 hover:bg-white/40 hover:text-blue-800'" 
+                                    class="px-4 py-2 rounded-xl text-sm font-semibold transition duration-300">
+                                Tuntutan Bayaran (TB)
+                            </button>
+                            
+                            <button @click="modul = 'TP'; paparan = 'senaraiTP'" 
+                                    :class="modul === 'TP' ? 'bg-white/60 border border-white/50 text-blue-700 shadow-sm' : 'text-gray-700 hover:bg-white/40 hover:text-blue-800'" 
+                                    class="px-4 py-2 rounded-xl text-sm font-semibold transition duration-300">
+                                Tuntutan Perjalanan (TP)
+                            </button>
+                            
+                            <a href="#" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-4 py-2 rounded-xl text-sm font-medium transition duration-300">Profil Perbankan</a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <a href="../index.html" class="bg-red-500/20 hover:bg-red-500/40 border border-red-200/50 text-red-700 px-5 py-2 rounded-xl text-sm font-bold transition duration-300 shadow-sm">Log Keluar</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+            
+            <div x-show="modul === 'TB'" style="display: none;">
+                <div class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 text-center h-64 flex flex-col items-center justify-center">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Modul Tuntutan Bayaran (TB)</h2>
+                    <p class="text-gray-600">Fungsi ini telah dibangunkan dalam prototaip fasa pertama.</p>
+                </div>
+            </div>
+
+            <div x-show="modul === 'TP'" style="display: none;">
+                
+                <div x-show="paparan === 'senaraiTP'" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">Senarai Tuntutan Perjalanan (TP)</h2>
+                            <p class="text-sm text-gray-600 mt-1">Sejarah permohonan tuntutan perjalanan (claim) anda.</p>
+                        </div>
+                        <button @click="paparan = 'borangTP'" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition">
+                            + Mohon TP Baharu
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto bg-white/50 rounded-xl shadow-sm border border-white/40">
+                        <table class="w-full text-left text-sm text-gray-700">
+                            <thead class="bg-blue-100/50 text-gray-800 font-semibold border-b border-white">
+                                <tr>
+                                    <th class="p-4">ID TP <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">tb-id</span></th>
+                                    <th class="p-4">Tarikh Mohon <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">tarikh-tb</span></th>
+                                    <th class="p-4">Amaun (RM) <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">pjlanan-amt</span></th>
+                                    <th class="p-4">Status <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">status-nama</span></th>
+                                    <th class="p-4 text-center">Tindakan</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/40">
+                                <tr class="hover:bg-white/40 transition">
+                                    <td class="p-4 font-medium">TP2026-0001</td>
+                                    <td class="p-4">15 Jan 2026</td>
+                                    <td class="p-4">250.00</td>
+                                    <td class="p-4"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-semibold">Diluluskan</span></td>
+                                    <td class="p-4 text-center"><button @click="paparan = 'paparTP'" class="text-blue-600 hover:underline text-xs font-semibold">Papar</button></td>
+                                </tr>
+                                <tr class="hover:bg-white/40 transition">
+                                    <td class="p-4 font-medium">TP2026-0045</td>
+                                    <td class="p-4">20 Feb 2026</td>
+                                    <td class="p-4">100.00</td>
+                                    <td class="p-4"><span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-xs font-semibold">Hantar Semula</span></td>
+                                    <td class="p-4 text-center">
+                                        <button @click="paparan = 'borangTP'" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded-lg text-xs font-semibold transition shadow-sm">Kemaskini</button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-white/40 transition">
+                                    <td class="p-4 font-medium">TP2026-0105</td>
+                                    <td class="p-4">05 Mac 2026</td>
+                                    <td class="p-4">450.00</td>
+                                    <td class="p-4"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">Baharu</span></td>
+                                    <td class="p-4 text-center"><button @click="paparan = 'paparTP'" class="text-blue-600 hover:underline text-xs font-semibold">Papar</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div x-show="paparan === 'borangTP'" style="display: none;" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+                    <div class="flex justify-between items-center mb-6 border-b border-gray-300/50 pb-4">
+                        <h2 class="text-2xl font-bold text-gray-800">Borang Tuntutan Perjalanan</h2>
+                        <button @click="paparan = 'senaraiTP'" class="text-gray-600 hover:text-gray-800 font-medium text-sm transition">&larr; Batal & Kembali</button>
+                    </div>
+
+                    <form class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">
+                                Nama Staf / Pemohon
+                                <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">staf-nama</span>
+                            </label>
+                            <input type="text" value="Ahmad Bin Abu" readonly class="w-full bg-gray-100/60 text-gray-600 border border-white/80 rounded-xl px-4 py-2 cursor-not-allowed shadow-sm backdrop-blur-sm">
+                        </div>
+
+                        <div class="mt-6">
+                            <h3 class="text-sm font-bold text-gray-800 mb-3 flex items-center justify-between">
+                                Butiran & Item Tuntutan
+                                <button type="button" class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-lg transition">+ Tambah Item</button>
+                            </h3>
+                            
+                            <div class="overflow-x-auto bg-white/60 rounded-xl shadow-sm border border-white/80">
+                                <table class="w-full text-left text-sm text-gray-700">
+                                    <thead class="bg-blue-100/40 text-gray-800 text-xs font-semibold border-b border-white">
+                                        <tr>
+                                            <th class="p-3">Jenis Elaun <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">aln-nama</span></th>
+                                            <th class="p-3">Mula <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">pjlanan-tarikhmula</span></th>
+                                            <th class="p-3">Tamat <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">pjlanan-tarikhakhir</span></th>
+                                            <th class="p-3">Jarak (KM) <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">pjlanan-jarak</span></th>
+                                            <th class="p-3">Malam <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">hotel-bilmlm</span></th>
+                                            <th class="p-3">Amaun (RM) <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">pjlanan-amt</span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-white/60">
+                                        <tr class="hover:bg-white/40">
+                                            <td class="p-2">
+                                                <select class="w-full text-xs bg-white border border-gray-200 rounded p-1">
+                                                    <option selected>Elaun Perbatuan</option>
+                                                </select>
+                                            </td>
+                                            <td class="p-2"><input type="date" value="2026-03-01" class="w-full text-xs bg-white border border-gray-200 rounded p-1"></td>
+                                            <td class="p-2"><input type="date" value="2026-03-01" class="w-full text-xs bg-white border border-gray-200 rounded p-1"></td>
+                                            <td class="p-2"><input type="number" value="50" class="w-full text-xs bg-white border border-gray-200 rounded p-1"></td>
+                                            <td class="p-2"><input type="number" value="0" class="w-full text-xs bg-white border border-gray-200 rounded p-1"></td>
+                                            <td class="p-2"><input type="number" step="0.01" value="42.50" class="w-full text-xs bg-white border border-gray-200 rounded p-1"></td>
+                                        </tr>
+                                        <tr class="hover:bg-white/40">
+                                            <td class="p-2">
+                                                <select class="w-full text-xs bg-white border border-gray-200 rounded p-1">
+                                                    <option selected>Elaun Penginapan</option>
+                                                </select>
+                                            </td>
+                                            <td class="p-2"><input type="date" value="2026-03-01" class="w-full text-xs bg-white border border-gray-200 rounded p-1"></td>
+                                            <td class="p-2"><input type="date" value="2026-03-02" class="w-full text-xs bg-white border border-gray-200 rounded p-1"></td>
+                                            <td class="p-2"><input type="number" value="0" class="w-full text-xs bg-white border border-gray-200 rounded p-1"></td>
+                                            <td class="p-2"><input type="number" value="1" class="w-full text-xs bg-white border border-gray-200 rounded p-1"></td>
+                                            <td class="p-2"><input type="number" step="0.01" value="250.00" class="w-full text-xs bg-white border border-gray-200 rounded p-1"></td>
+                                        </tr>
+                                        <tr class="hover:bg-white/40">
+                                            <td class="p-2">
+                                                <select class="w-full text-xs bg-white border border-gray-200 rounded p-1">
+                                                    <option selected>Elaun Makan</option>
+                                                </select>
+                                            </td>
+                                            <td class="p-2"><input type="date" value="2026-03-01" class="w-full text-xs bg-white border border-gray-200 rounded p-1"></td>
+                                            <td class="p-2"><input type="date" value="2026-03-02" class="w-full text-xs bg-white border border-gray-200 rounded p-1"></td>
+                                            <td class="p-2"><input type="number" value="0" class="w-full text-xs bg-white border border-gray-200 rounded p-1"></td>
+                                            <td class="p-2"><input type="number" value="0" class="w-full text-xs bg-white border border-gray-200 rounded p-1"></td>
+                                            <td class="p-2"><input type="number" step="0.01" value="90.00" class="w-full text-xs bg-white border border-gray-200 rounded p-1"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 p-5 bg-blue-50/50 border border-blue-200 rounded-2xl">
+                            <h3 class="text-sm font-bold text-gray-800 mb-3">Dokumen Sokongan / Resit Tuntutan</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">
+                                        Muat Naik Fail
+                                        <span class="ml-1 text-[9px] font-mono text-indigo-700 bg-indigo-100 px-1 rounded">doksokongan-file</span>
+                                    </label>
+                                    <input type="file" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">
+                                        ID Rujukan Dokumen
+                                        <span class="ml-1 text-[9px] font-mono text-indigo-700 bg-indigo-100 px-1 rounded">doksokongan-idrujukan</span>
+                                    </label>
+                                    <input type="text" placeholder="Cth: REF-HOTEL-123" class="w-full bg-white/80 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end space-x-3 pt-6 border-t border-gray-300/50 mt-8">
+                            <button type="button" @click="paparan = 'senaraiTP'" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded-xl transition shadow-sm">
+                                Batal
+                            </button>
+                            <button type="button" @click="paparan = 'senaraiTP'; alert('Permohonan Tuntutan Perjalanan (TP) berjaya dihantar!')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-xl shadow-md transition">
+                                Hantar Permohonan TP
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div x-show="paparan === 'paparTP'" style="display: none;" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+                    <div class="flex justify-between items-center mb-6 border-b border-gray-300/50 pb-4">
+                        <h2 class="text-2xl font-bold text-gray-800">Maklumat Tuntutan Perjalanan</h2>
+                        <button @click="paparan = 'senaraiTP'" class="text-gray-600 hover:text-gray-800 font-medium text-sm transition">&larr; Kembali</button>
+                    </div>
+
+                    <div class="bg-white/50 rounded-xl p-6 border border-white/60 space-y-4 shadow-sm">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase font-semibold">ID Tuntutan</p>
+                                <p class="text-gray-800 font-medium">TP2026-0001</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase font-semibold">Status</p>
+                                <p class="text-emerald-700 font-medium bg-emerald-100 px-2 py-0.5 rounded inline-block text-sm">Diluluskan</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase font-semibold">Pemohon</p>
+                                <p class="text-gray-800 font-medium">Ahmad Bin Abu</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase font-semibold">Tarikh Mohon</p>
+                                <p class="text-gray-800 font-medium">15 Jan 2026</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase font-semibold mb-1 pt-4">Jumlah Amaun Lulus</p>
+                            <p class="text-gray-800 font-medium text-lg text-blue-700">RM 250.00</p>
+                        </div>
+                        
+                        <div class="pt-4 border-t border-gray-300/50 mt-4">
+                            <p class="text-xs text-gray-500 uppercase font-semibold mb-2">Lampiran Dokumen</p>
+                            <a href="#" class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                                Resit_Penginapan.pdf
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</body>
+</html>

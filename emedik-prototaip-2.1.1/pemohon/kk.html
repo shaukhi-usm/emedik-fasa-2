@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eMedik - Tuntutan Kemudahan Kesihatan (Pemohon)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-100 via-blue-200 to-indigo-200 min-h-screen font-sans selection:bg-blue-300">
+
+    <nav class="bg-white/40 backdrop-blur-md border-b border-white/50 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center">
+                    <span class="font-bold text-2xl text-gray-800 tracking-wide">eMedik <span class="text-blue-700 text-sm font-medium ml-1 px-2 py-1 bg-white/50 rounded-lg">Pemohon</span></span>
+                </div>
+                
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-1">
+                        <!-- Pautan Utama Dikembalikan -->
+                        <a href="index.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Utama</a>
+                       
+                        <a href="tb.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Tuntutan Bayaran</a>
+                        <a href="tp.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Tuntutan Perjalanan</a>
+                        <a href="kk.html" class="bg-white/60 border border-white/50 text-blue-700 px-3 py-2 rounded-xl text-sm font-semibold shadow-sm">Tuntutan Kemudahan Kesihatan</a>
+						<a href="bp.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Bagi Pihak</a>
+						<a href="profil.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Profil Perbankan</a>
+                    </div>
+                </div>
+
+                <div>
+                    <a href="../index.html" class="bg-red-500/20 hover:bg-red-500/40 border border-red-200/50 text-red-700 px-5 py-2 rounded-xl text-sm font-bold transition duration-300 shadow-sm">Log Keluar</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main x-data="{ paparan: 'senaraiKK', kategoriPukal: '0' }" class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        
+        <div x-show="paparan === 'senaraiKK'" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Senarai Tuntutan Fasiliti Kesihatan (KK)</h2>
+                    <p class="text-sm text-gray-600 mt-1">Sejarah permohonan tuntutan bayaran dari panel/fasiliti kesihatan.</p>
+                </div>
+                <button @click="paparan = 'borangKK'" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition">
+                    + Mohon Tuntutan KK Baharu
+                </button>
+            </div>
+
+            <div class="overflow-x-auto bg-white/50 rounded-xl shadow-sm border border-white/40">
+                <table class="w-full text-left text-sm text-gray-700">
+                    <thead class="bg-blue-100/50 text-gray-800 font-semibold border-b border-white">
+                        <tr>
+                            <th class="p-4">ID Tuntutan <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">tb-id</span></th>
+                            <th class="p-4">Fasiliti Kesihatan <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">fas-nama</span></th>
+                            <th class="p-4">Kategori <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">tb-ispukal</span></th>
+                            <th class="p-4">Amaun (RM) <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">tuntutan-amt</span></th>
+                            <th class="p-4">Status <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">status-nama</span></th>
+                            <th class="p-4 text-center">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/40">
+                        <tr class="hover:bg-white/40 transition">
+                            <td class="p-4 font-medium">KK2026-0010</td>
+                            <td class="p-4">Klinik Kesihatan Gelugor</td>
+                            <td class="p-4">INDIVIDU</td>
+                            <td class="p-4">120.00</td>
+                            <td class="p-4"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-semibold">Diluluskan</span></td>
+                            <td class="p-4 text-center"><button @click="paparan = 'paparKK'" class="text-blue-600 hover:underline text-xs font-semibold">Papar</button></td>
+                        </tr>
+                        <tr class="hover:bg-white/40 transition">
+                            <td class="p-4 font-medium">KK2026-0042</td>
+                            <td class="p-4">Hospital Pulau Pinang</td>
+                            <td class="p-4">PUKAL</td>
+                            <td class="p-4">850.50</td>
+                            <td class="p-4"><span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-xs font-semibold">Hantar Semula</span></td>
+                            <td class="p-4 text-center">
+                                <button @click="paparan = 'borangKK'" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded-lg text-xs font-semibold transition shadow-sm">Kemaskini</button>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-white/40 transition">
+                            <td class="p-4 font-medium">KK2026-0088</td>
+                            <td class="p-4">Pusat Dialisis Sejahtera</td>
+                            <td class="p-4">INDIVIDU</td>
+                            <td class="p-4">200.00</td>
+                            <td class="p-4"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">Baharu</span></td>
+                            <td class="p-4 text-center"><button @click="paparan = 'paparKK'" class="text-blue-600 hover:underline text-xs font-semibold">Papar</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div x-show="paparan === 'borangKK'" style="display: none;" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-300/50 pb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Borang Tuntutan Kemudahan Kesihatan (KK)</h2>
+                <button @click="paparan = 'senaraiKK'; kategoriPukal='0';" class="text-gray-600 hover:text-gray-800 font-medium text-sm transition">&larr; Batal & Kembali</button>
+            </div>
+
+            <form class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Fasiliti Kesihatan / Senarai KK <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">fas-id</span></label>
+                        <select class="w-full bg-white/60 border border-white/80 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="">Sila Pilih Fasiliti...</option>
+                            <option value="F001">Klinik Kesihatan Gelugor</option>
+                            <option value="F002">Hospital Pulau Pinang</option>
+                            <option value="F003">Pusat Dialisis Sejahtera</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Kategori Permohonan <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">tb-ispukal</span></label>
+                        <select x-model="kategoriPukal" class="w-full bg-white/60 border border-white/80 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="0">INDIVIDU (0)</option>
+                            <option value="1">PUKAL (1)</option>
+                        </select>
+                    </div>
+
+                    <div x-show="kategoriPukal === '1'" style="display: none;" class="transition-all">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Profil Staf / Tanggungan <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">pesakit-id</span></label>
+                        <select class="w-full bg-amber-50 border border-amber-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 text-amber-900">
+                            <option value="">Sila Pilih Profil (Pukal)...</option>
+                            <option value="P01">Ahmad Bin Abu (Staf)</option>
+                            <option value="P02">Siti Binti Abu (Tanggungan)</option>
+                        </select>
+                    </div>
+
+                    <div x-show="kategoriPukal === '0'" class="transition-all">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Surat Kelulusan Berkaitan <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">sk-id</span></label>
+                        <select class="w-full bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 text-emerald-900">
+                            <option value="">Sila Pilih SK yang Diluluskan...</option>
+                            <option value="SK1">SK2026-0992 - Ahmad Bin Abu</option>
+                            <option value="SK2">SK2026-1005 - Siti Binti Abu</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">No. Invois / Bil <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">tb-noinvois</span></label>
+                        <input type="text" placeholder="INV-KK-123" class="w-full bg-white/60 border border-white/80 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tarikh Rawatan <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">tarikh-rawatan</span></label>
+                        <input type="date" class="w-full bg-white/60 border border-white/80 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Kategori Item Tuntutan <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">tnt-id</span></label>
+                        <select class="w-full bg-white/60 border border-white/80 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="UBAT">UBAT</option>
+                            <option value="RAWATAN">RAWATAN</option>
+                            <option value="ALAT">ALAT SOKONGAN</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Amaun Tuntutan (RM) <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">tuntutan-amt</span></label>
+                        <input type="number" step="0.01" placeholder="0.00" class="w-full bg-white/60 border border-white/80 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div class="mt-6 p-5 bg-blue-50/50 border border-blue-200 rounded-2xl">
+                    <h3 class="text-sm font-bold text-gray-800 mb-3">Dokumen Invois/Resit KK</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Pilih Fail Dokumen <span class="ml-1 text-[9px] font-mono text-indigo-700 bg-indigo-100 px-1 rounded">dok-fileid</span></label>
+                            <input type="file" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Nama Dokumen <span class="ml-1 text-[9px] font-mono text-indigo-700 bg-indigo-100 px-1 rounded">dok-nama</span></label>
+                            <input type="text" placeholder="Cth: Resit Klinik Kesihatan Gelugor" class="w-full bg-white/80 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Nota Tambahan Dokumen <span class="ml-1 text-[9px] font-mono text-indigo-700 bg-indigo-100 px-1 rounded">dok-nota</span></label>
+                            <input type="text" placeholder="Catatan jika perlu..." class="w-full bg-white/80 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 mt-8 border-t border-gray-300/50 pt-6">
+                    <button type="button" @click="paparan = 'senaraiKK'; kategoriPukal='0';" class="bg-gray-200 hover:bg-gray-300 py-2 px-6 rounded-xl font-semibold shadow-sm transition">Batal</button>
+                    <button type="button" @click="paparan = 'senaraiKK'; alert('Permohonan Tuntutan KK berjaya dihantar!'); kategoriPukal='0';" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-xl font-semibold shadow-md transition">Hantar Tuntutan KK</button>
+                </div>
+            </form>
+        </div>
+
+        <div x-show="paparan === 'paparKK'" style="display: none;" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-300/50 pb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Maklumat Tuntutan Fasiliti Kesihatan</h2>
+                <button @click="paparan = 'senaraiKK'" class="text-gray-600 hover:text-gray-800 font-medium text-sm transition">&larr; Kembali</button>
+            </div>
+
+            <div class="bg-white/50 rounded-xl p-6 border border-white/60 space-y-4 shadow-sm">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-semibold">ID Tuntutan</p>
+                        <p class="text-gray-800 font-medium">KK2026-0010</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-semibold">Status</p>
+                        <p class="text-emerald-700 font-medium bg-emerald-100 px-2 py-0.5 rounded inline-block text-sm">Diluluskan</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-semibold">Kategori</p>
+                        <p class="text-gray-800 font-medium">INDIVIDU</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-semibold">Tarikh Rawatan</p>
+                        <p class="text-gray-800 font-medium">10 Mac 2026</p>
+                    </div>
+                </div>
+                
+                <div class="border-t border-gray-300/50 pt-4 mt-4">
+                    <p class="text-xs text-gray-500 uppercase font-semibold mb-1">Fasiliti Kesihatan</p>
+                    <p class="text-gray-800">Klinik Kesihatan Gelugor</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-semibold mb-1">Surat Kelulusan Rujukan</p>
+                        <p class="text-gray-800">SK2026-0992</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-semibold mb-1">No Invois</p>
+                        <p class="text-gray-800">INV-KK-123</p>
+                    </div>
+                </div>
+
+                <div class="mt-4 border-t border-gray-300/50 pt-4">
+                    <p class="text-xs text-gray-500 uppercase font-semibold mb-1">Amaun Dituntut</p>
+                    <p class="text-gray-800 font-medium text-lg text-blue-700">RM 120.00</p>
+                </div>
+                
+                <div class="pt-4">
+                    <p class="text-xs text-gray-500 uppercase font-semibold mb-2">Lampiran Invois</p>
+                    <a href="#" class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                        Resit_Klinik_Gelugor.pdf
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

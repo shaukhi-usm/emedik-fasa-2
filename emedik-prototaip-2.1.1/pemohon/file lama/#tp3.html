@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eMedik - Tuntutan Perjalanan (Pemohon)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-100 via-blue-200 to-indigo-200 min-h-screen font-sans selection:bg-blue-300">
+
+    <nav class="bg-white/40 backdrop-blur-md border-b border-white/50 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center">
+                    <span class="font-bold text-2xl text-gray-800 tracking-wide">eMedik <span class="text-blue-700 text-sm font-medium ml-1 px-2 py-1 bg-white/50 rounded-lg">Pemohon</span></span>
+                </div>
+                
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-1">
+                        <a href="index.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Utama</a>
+                        <a href="tb.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Tuntutan Bayaran</a>
+                        <a href="tp.html" class="bg-white/60 border border-white/50 text-blue-700 px-3 py-2 rounded-xl text-sm font-semibold shadow-sm">Tuntutan Perjalanan</a>
+                        <a href="kk.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Tuntutan Kemudahan Kesihatan</a>
+                        <a href="bp.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Bagi Pihak</a>
+                        <a href="profil.html" class="text-gray-700 hover:bg-white/40 hover:text-blue-800 px-3 py-2 rounded-xl text-sm font-medium transition duration-300">Profil Perbankan</a>
+                    </div>
+                </div>
+
+                <div>
+                    <a href="../index.html" class="bg-red-500/20 hover:bg-red-500/40 border border-red-200/50 text-red-700 px-5 py-2 rounded-xl text-sm font-bold transition duration-300 shadow-sm">Log Keluar</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main x-data="{ 
+            paparan: 'senaraiTP',
+            tabAktif: 'perbatuan', // 'perbatuan', 'penginapan', 'makan'
+            
+            // Contoh Data (Borang)
+            itemPerbatuan: [
+                { id: 1, jenis: 'Elaun Perbatuan', mula: '2026-03-01', tamat: '2026-03-01', jarak: 50, amaun: 25.00 }
+            ],
+            itemPenginapan: [
+                { id: 2, jenis: 'Elaun Penginapan', mula: '2026-03-01', tamat: '2026-03-02', malam: 1, amaun: 250.00 }
+            ],
+            itemMakan: [
+                { id: 3, jenis: 'Elaun Makan', mula: '2026-03-01', tamat: '2026-03-02', amaun: 90.00 }
+            ],
+            
+            // FUNGSI: Tambah & Buang Baris
+            tambahPerbatuan() { this.itemPerbatuan.push({ id: Date.now(), jenis: 'Elaun Perbatuan', mula: '', tamat: '', jarak: '', amaun: 0.00 }); },
+            buangPerbatuan(index) { this.itemPerbatuan.splice(index, 1); },
+            
+            tambahPenginapan() { this.itemPenginapan.push({ id: Date.now(), jenis: 'Elaun Penginapan', mula: '', tamat: '', malam: 0, amaun: 0.00 }); },
+            buangPenginapan(index) { this.itemPenginapan.splice(index, 1); },
+            
+            tambahMakan() { this.itemMakan.push({ id: Date.now(), jenis: 'Elaun Makan', mula: '', tamat: '', amaun: 0.00 }); },
+            buangMakan(index) { this.itemMakan.splice(index, 1); },
+
+            // FUNGSI: Pengiraan Automatik Perbatuan (Kadar Berperingkat)
+            kiraPerbatuan(item) {
+                let d = parseFloat(item.jarak) || 0;
+                let amt = 0;
+                if (d <= 50) {
+                    amt = d * 0.50;
+                } else if (d <= 100) {
+                    amt = (50 * 0.50) + ((d - 50) * 1.00);
+                } else if (d <= 150) {
+                    amt = (50 * 0.50) + (50 * 1.00) + ((d - 100) * 1.50);
+                } else {
+                    amt = (50 * 0.50) + (50 * 1.00) + (50 * 1.50) + ((d - 150) * 2.00);
+                }
+                item.amaun = amt.toFixed(2);
+            },
+
+            // FUNGSI: Pengiraan Automatik Jumlah Malam
+            kiraMalam(item) {
+                if (item.mula && item.tamat) {
+                    let d1 = new Date(item.mula);
+                    let d2 = new Date(item.tamat);
+                    let diff = d2 - d1;
+                    let days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+                    item.malam = days > 0 ? days : 0;
+                } else {
+                    item.malam = 0;
+                }
+            }
+        }" class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        
+        <div x-show="paparan === 'senaraiTP'" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Senarai Tuntutan Perjalanan (TP)</h2>
+                    <p class="text-sm text-gray-600 mt-1">Sejarah permohonan tuntutan perjalanan anda.</p>
+                </div>
+                <button @click="paparan = 'borangTP'" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition">
+                    + Mohon TP Baharu
+                </button>
+            </div>
+
+            <div class="overflow-x-auto bg-white/50 rounded-xl shadow-sm border border-white/40">
+                <table class="w-full text-left text-sm text-gray-700">
+                    <thead class="bg-blue-100/50 text-gray-800 font-semibold border-b border-white">
+                        <tr>
+                            <th class="p-4">ID TP <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">tb-id</span></th>
+                            <th class="p-4">Tarikh Mohon <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">tarikh-tb</span></th>
+                            <th class="p-4">Amaun (RM) <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">pjlanan-amt</span></th>
+                            <th class="p-4">Status <br><span class="text-[10px] font-mono text-blue-600 bg-blue-100 px-1 rounded">status-nama</span></th>
+                            <th class="p-4 text-center">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/40">
+                        <tr class="hover:bg-white/40 transition">
+                            <td class="p-4 font-medium">TP2026-0001</td>
+                            <td class="p-4">15 Jan 2026</td>
+                            <td class="p-4">250.00</td>
+                            <td class="p-4"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-semibold">Diluluskan</span></td>
+                            <td class="p-4 text-center"><button @click="paparan = 'paparTP'" class="text-blue-600 hover:underline text-xs font-semibold">Papar</button></td>
+                        </tr>
+                        <tr class="hover:bg-white/40 transition">
+                            <td class="p-4 font-medium">TP2026-0045</td>
+                            <td class="p-4">20 Feb 2026</td>
+                            <td class="p-4">100.00</td>
+                            <td class="p-4"><span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-xs font-semibold">Hantar Semula</span></td>
+                            <td class="p-4 text-center">
+                                <button @click="paparan = 'borangTP'" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded-lg text-xs font-semibold transition shadow-sm">Kemaskini</button>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-white/40 transition">
+                            <td class="p-4 font-medium">TP2026-0105</td>
+                            <td class="p-4">05 Mac 2026</td>
+                            <td class="p-4">450.00</td>
+                            <td class="p-4"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">Baharu</span></td>
+                            <td class="p-4 text-center"><button @click="paparan = 'paparTP'" class="text-blue-600 hover:underline text-xs font-semibold">Papar</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div x-show="paparan === 'borangTP'" style="display: none;" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-300/50 pb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Borang Tuntutan Perjalanan</h2>
+                <button @click="paparan = 'senaraiTP'" class="text-gray-600 hover:text-gray-800 font-medium text-sm transition">&larr; Batal & Kembali</button>
+            </div>
+
+            <form class="space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Staf <span class="ml-2 text-[10px] font-mono text-indigo-700 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">staf-nama</span></label>
+                    <input type="text" value="Ahmad Bin Abu" readonly class="w-full bg-gray-100/60 text-gray-600 border border-white/80 rounded-xl px-4 py-2 cursor-not-allowed">
+                </div>
+
+                <div class="mt-6 bg-white/50 rounded-2xl p-6 border border-white/60 shadow-sm">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Butiran & Item Tuntutan</h3>
+                    
+                    <div class="flex space-x-2 border-b border-gray-300/50 mb-6">
+                        <button type="button" @click="tabAktif = 'perbatuan'" 
+                            :class="tabAktif === 'perbatuan' ? 'border-blue-600 text-blue-700 border-b-2 font-bold bg-blue-50/50' : 'text-gray-500 hover:text-blue-600 hover:bg-white/50'" 
+                            class="px-4 py-3 rounded-t-lg transition text-sm">
+                            🚗 Elaun Perbatuan
+                        </button>
+                        <button type="button" @click="tabAktif = 'penginapan'" 
+                            :class="tabAktif === 'penginapan' ? 'border-blue-600 text-blue-700 border-b-2 font-bold bg-blue-50/50' : 'text-gray-500 hover:text-blue-600 hover:bg-white/50'" 
+                            class="px-4 py-3 rounded-t-lg transition text-sm">
+                            🏨 Elaun Penginapan
+                        </button>
+                        <button type="button" @click="tabAktif = 'makan'" 
+                            :class="tabAktif === 'makan' ? 'border-blue-600 text-blue-700 border-b-2 font-bold bg-blue-50/50' : 'text-gray-500 hover:text-blue-600 hover:bg-white/50'" 
+                            class="px-4 py-3 rounded-t-lg transition text-sm">
+                            🍽️ Elaun Makan
+                        </button>
+                    </div>
+
+                    <div x-show="tabAktif === 'perbatuan'">
+                        <div class="flex justify-between items-end mb-3">
+                            <div class="text-xs text-indigo-700 bg-indigo-50 border border-indigo-100 p-2 rounded-lg">
+                                <span class="font-bold">Info Kadar Jarak:</span> 0-50km = RM0.50 | 51-100km = RM1.00 | 101-150km = RM1.50 | 151km++ = RM2.00
+                            </div>
+                            <button type="button" @click="tambahPerbatuan()" class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition shadow-sm font-semibold">
+                                + Tambah Perbatuan
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto bg-white/80 rounded-xl shadow-sm border border-gray-200">
+                            <table class="w-full text-left text-sm text-gray-700">
+                                <thead class="bg-blue-100/40 text-gray-800 text-xs font-semibold border-b border-gray-200">
+                                    <tr>
+                                        <th class="p-3">Jenis Elaun <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">aln-nama</span></th>
+                                        <th class="p-3">Mula <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">pjlanan-tarikhmula</span></th>
+                                        <th class="p-3">Tamat <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">pjlanan-tarikhakhir</span></th>
+                                        <th class="p-3">Jarak (KM) <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">pjlanan-jarak</span></th>
+                                        <th class="p-3">Amaun (RM) <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">pjlanan-amt</span></th>
+                                        <th class="p-3 text-center">Padam</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <template x-for="(item, index) in itemPerbatuan" :key="item.id">
+                                        <tr class="hover:bg-blue-50/30">
+                                            <td class="p-2"><input type="text" x-model="item.jenis" readonly class="w-full text-xs bg-gray-100/50 text-gray-500 rounded p-1.5 border border-gray-200 cursor-not-allowed"></td>
+                                            <td class="p-2"><input type="date" x-model="item.mula" class="w-full text-xs bg-white rounded p-1.5 border border-gray-300 focus:ring-1 focus:ring-blue-500"></td>
+                                            <td class="p-2"><input type="date" x-model="item.tamat" class="w-full text-xs bg-white rounded p-1.5 border border-gray-300 focus:ring-1 focus:ring-blue-500"></td>
+                                            <td class="p-2"><input type="number" x-model="item.jarak" @input="kiraPerbatuan(item)" placeholder="0" class="w-full text-xs bg-white rounded p-1.5 border border-gray-300 focus:ring-1 focus:ring-blue-500"></td>
+                                            <td class="p-2"><input type="number" step="0.01" x-model="item.amaun" readonly class="w-full text-xs bg-emerald-50 text-emerald-800 font-semibold rounded p-1.5 border border-emerald-200 cursor-not-allowed"></td>
+                                            <td class="p-2 text-center">
+                                                <button type="button" @click="buangPerbatuan(index)" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded p-1.5 transition">
+                                                    <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div x-show="tabAktif === 'penginapan'" style="display: none;">
+                        <div class="flex justify-end mb-3">
+                            <button type="button" @click="tambahPenginapan()" class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition shadow-sm font-semibold">
+                                + Tambah Penginapan
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto bg-white/80 rounded-xl shadow-sm border border-gray-200">
+                            <table class="w-full text-left text-sm text-gray-700">
+                                <thead class="bg-blue-100/40 text-gray-800 text-xs font-semibold border-b border-gray-200">
+                                    <tr>
+                                        <th class="p-3">Jenis Elaun <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">aln-nama</span></th>
+                                        <th class="p-3">Mula <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">pjlanan-tarikhmula</span></th>
+                                        <th class="p-3">Tamat <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">pjlanan-tarikhakhir</span></th>
+                                        <th class="p-3">Malam <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">hotel-bilmlm</span></th>
+                                        <th class="p-3">Amaun (RM) <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">pjlanan-amt</span></th>
+                                        <th class="p-3 text-center">Padam</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <template x-for="(item, index) in itemPenginapan" :key="item.id">
+                                        <tr class="hover:bg-blue-50/30">
+                                            <td class="p-2"><input type="text" x-model="item.jenis" readonly class="w-full text-xs bg-gray-100/50 text-gray-500 rounded p-1.5 border border-gray-200 cursor-not-allowed"></td>
+                                            <td class="p-2"><input type="date" x-model="item.mula" @input="kiraMalam(item)" class="w-full text-xs bg-white rounded p-1.5 border border-gray-300 focus:ring-1 focus:ring-blue-500"></td>
+                                            <td class="p-2"><input type="date" x-model="item.tamat" @input="kiraMalam(item)" class="w-full text-xs bg-white rounded p-1.5 border border-gray-300 focus:ring-1 focus:ring-blue-500"></td>
+                                            <td class="p-2"><input type="number" x-model="item.malam" readonly placeholder="0" class="w-full text-xs bg-indigo-50 text-indigo-800 font-semibold rounded p-1.5 border border-indigo-200 cursor-not-allowed"></td>
+                                            <td class="p-2"><input type="number" step="0.01" x-model="item.amaun" class="w-full text-xs bg-white rounded p-1.5 border border-gray-300 focus:ring-1 focus:ring-blue-500"></td>
+                                            <td class="p-2 text-center">
+                                                <button type="button" @click="buangPenginapan(index)" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded p-1.5 transition">
+                                                    <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div x-show="tabAktif === 'makan'" style="display: none;">
+                        <div class="flex justify-end mb-3">
+                            <button type="button" @click="tambahMakan()" class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition shadow-sm font-semibold">
+                                + Tambah Makan
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto bg-white/80 rounded-xl shadow-sm border border-gray-200">
+                            <table class="w-full text-left text-sm text-gray-700">
+                                <thead class="bg-blue-100/40 text-gray-800 text-xs font-semibold border-b border-gray-200">
+                                    <tr>
+                                        <th class="p-3">Jenis Elaun <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">aln-nama</span></th>
+                                        <th class="p-3">Mula <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">pjlanan-tarikhmula</span></th>
+                                        <th class="p-3">Tamat <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">pjlanan-tarikhakhir</span></th>
+                                        <th class="p-3">Amaun (RM) <br><span class="text-[9px] font-mono text-blue-600 bg-blue-100 px-1 rounded">pjlanan-amt</span></th>
+                                        <th class="p-3 text-center">Padam</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <template x-for="(item, index) in itemMakan" :key="item.id">
+                                        <tr class="hover:bg-blue-50/30">
+                                            <td class="p-2"><input type="text" x-model="item.jenis" readonly class="w-full text-xs bg-gray-100/50 text-gray-500 rounded p-1.5 border border-gray-200 cursor-not-allowed"></td>
+                                            <td class="p-2"><input type="date" x-model="item.mula" class="w-full text-xs bg-white rounded p-1.5 border border-gray-300 focus:ring-1 focus:ring-blue-500"></td>
+                                            <td class="p-2"><input type="date" x-model="item.tamat" class="w-full text-xs bg-white rounded p-1.5 border border-gray-300 focus:ring-1 focus:ring-blue-500"></td>
+                                            <td class="p-2"><input type="number" step="0.01" x-model="item.amaun" class="w-full text-xs bg-white rounded p-1.5 border border-gray-300 focus:ring-1 focus:ring-blue-500"></td>
+                                            <td class="p-2 text-center">
+                                                <button type="button" @click="buangMakan(index)" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded p-1.5 transition">
+                                                    <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-5 bg-blue-50/50 border border-blue-200 rounded-2xl">
+                    <h3 class="text-sm font-bold text-gray-800 mb-3">Dokumen Sokongan / Resit Tuntutan</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Muat Naik Fail <span class="ml-1 text-[9px] font-mono text-indigo-700 bg-indigo-100 px-1 rounded">doksokongan-file</span></label>
+                            <input type="file" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">ID Rujukan Dokumen <span class="ml-1 text-[9px] font-mono text-indigo-700 bg-indigo-100 px-1 rounded">doksokongan-idrujukan</span></label>
+                            <input type="text" placeholder="REF-HOTEL-123" class="w-full bg-white/80 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 mt-8">
+                    <button type="button" @click="paparan = 'senaraiTP'" class="bg-gray-200 hover:bg-gray-300 py-2 px-6 rounded-xl font-semibold shadow-sm transition">Batal</button>
+                    <button type="button" @click="paparan = 'senaraiTP'; alert('Permohonan berjaya dihantar!')" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-xl font-semibold shadow-md transition">Hantar Permohonan TP</button>
+                </div>
+            </form>
+        </div>
+
+        <div x-show="paparan === 'paparTP'" style="display: none;" class="bg-white/30 backdrop-blur-lg border border-white/60 shadow-xl rounded-3xl p-8 transition-all">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-300/50 pb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Maklumat Tuntutan Perjalanan</h2>
+                <button @click="paparan = 'senaraiTP'" class="text-gray-600 hover:text-gray-800 font-medium text-sm transition">&larr; Kembali</button>
+            </div>
+
+            <div class="bg-white/50 rounded-xl p-6 border border-white/60 space-y-6 shadow-sm">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-semibold">ID Tuntutan</p>
+                        <p class="text-gray-800 font-medium">TP2026-0001</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-semibold">Status</p>
+                        <p class="text-emerald-700 font-medium bg-emerald-100 px-2 py-0.5 rounded inline-block text-sm">Diluluskan</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-semibold">Pemohon</p>
+                        <p class="text-gray-800 font-medium">Ahmad Bin Abu</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-semibold">Tarikh Mohon</p>
+                        <p class="text-gray-800 font-medium">15 Jan 2026</p>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-300/50 pt-4">
+                    <p class="text-xs text-gray-500 uppercase font-semibold mb-3">Item Tuntutan</p>
+                    <div class="overflow-x-auto bg-white/60 rounded-lg border border-white/80">
+                        <table class="w-full text-left text-sm text-gray-700">
+                            <thead class="bg-blue-100/40 text-gray-800 text-xs font-semibold">
+                                <tr>
+                                    <th class="p-3">Jenis Elaun</th>
+                                    <th class="p-3">Mula</th>
+                                    <th class="p-3">Tamat</th>
+                                    <th class="p-3">Jarak (KM)</th>
+                                    <th class="p-3">Malam</th>
+                                    <th class="p-3 text-right">Amaun (RM)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/60">
+                                <tr>
+                                    <td class="p-3">Elaun Perbatuan</td>
+                                    <td class="p-3">01-03-2026</td>
+                                    <td class="p-3">01-03-2026</td>
+                                    <td class="p-3">50</td>
+                                    <td class="p-3">-</td>
+                                    <td class="p-3 text-right font-medium">42.50</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3">Elaun Penginapan</td>
+                                    <td class="p-3">01-03-2026</td>
+                                    <td class="p-3">02-03-2026</td>
+                                    <td class="p-3">-</td>
+                                    <td class="p-3">1</td>
+                                    <td class="p-3 text-right font-medium">250.00</td>
+                                </tr>
+                                <tr class="bg-blue-50/50">
+                                    <td colspan="5" class="p-3 text-right font-bold text-gray-800">Jumlah Keseluruhan:</td>
+                                    <td class="p-3 text-right font-bold text-blue-700">RM 292.50</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="border-t border-gray-300/50 pt-4">
+                    <p class="text-xs text-gray-500 uppercase font-semibold mb-2">Lampiran Dokumen</p>
+                    <a href="#" class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline bg-white/60 px-3 py-2 rounded-lg border border-white/80 transition">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                        Resit_Penginapan.pdf
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>
